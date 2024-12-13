@@ -1,3 +1,4 @@
+from .__init__ import *
 from .I18n import I18n
 from .Tools import color
 
@@ -16,7 +17,7 @@ T = TypeVar("T")
 
 
 class Roll:
-    rollTextStructureSet: set[str] = {
+    rollNumTextStructureSet: set[str] = {
         r"(\d*)(d|D)(\d+)(( +)?((\+|\-)(\d+)))?"
     }
 
@@ -46,16 +47,18 @@ class Roll:
         Returns:
             str: output
         """
-        _ = True
+        isReplace: bool = True
+        rText = text
         match text.lower():
             case "int" | "intelligence":
-                text = "智力"
+                rText = "智力"
             case "san" | "sanity":
-                text = "理智"
+                rText = "理智"
             case _:
-                _ = False
-        text += " " if _ else ""
-        return text
+                isReplace = False
+        rText += " " if isReplace else ""
+        logger.debug(f"rollTextReplace({repr(text)}) -> {repr(rText)}")
+        return rText
 
     def __init__(self, debug: bool = False, seed: int | float | str | bytes | bytearray = time.time(),  rollType: RollType = RollType.NONE, logSum: bool = True, isLog: bool = True) -> None:
         self.debug = debug
@@ -92,36 +95,23 @@ class Roll:
     def seed(self, seed: int | float | str | bytes | bytearray) -> None:
         self.__seed = seed
         self.__random_obj.seed(seed)
+        logger.debug(f"set seed={self.seed}")
 
-    def RollNum(self, rollText: str | None = None, *, xD: int | None = None, Dy: int | None = None, sumBonus: int = 0, bonus: int = 0, success: int | None = None, whyJudged: str = ""):
-        trueRollText: str
+    def RollNumRegTools(self, rollText: str):
         rollTextNotMatchTheStructure = Exception(self.__i18n_obj.locale(
-            "paul_tools__Roll__Roll__Exception__rollText_Not_Match_The_Structure", repr(rollText), repr(self.rollTextStructureSet)))
-
-        if rollText == None:
-            if Dy != None:
-                trueRollText = f"d{Dy}" if xD == None else f"{xD}d{Dy}"
-            else:
-                match self.rollType:
-                    case self.RollType.COC:
-                        trueRollText = "1d100"
-                    case self.RollType.DND:
-                        trueRollText = "1d20"
-                    case _:
-                        raise rollTextNotMatchTheStructure
-        else:
-            trueRollText = rollText
-
+            "paul_tools__Roll__Roll__Exception__rollText_Not_Match_The_Structure", repr(rollText), repr(self.rollNumTextStructureSet)))
         rollData: list[str] | None = None
         userReg = None
-        for rollTextStructure in self.rollTextStructureSet:
-            if (tmp1 := re.search(rollTextStructure, trueRollText)) == None:
+        for rollTextStructure in self.rollNumTextStructureSet:
+            if (tmp1 := re.search(rollTextStructure, rollText)) == None:
                 continue
             userReg = rollTextStructure
             rollData = [tmp1.group(1), tmp1.group(3), tmp1.group(6)]
             break
         if rollData is None:
             raise rollTextNotMatchTheStructure
+        else:
+            logger.debug(f"RollNumRegTools({repr(rollText)})--{userReg=}")
 
         if (rollData[0] == ""):
             rollData[0] = "1"
@@ -130,14 +120,25 @@ class Roll:
             rollData[2] = "0"
         for tmp1 in rollData:
             intRollData.append(int(tmp1))
+        logger.debug(f"RollNumRegTools({rollText})--{userReg=}-{intRollData=}")
+        return intRollData
 
-        try:
-            xD, Dy = [intRollData[0], intRollData[1]]
-            if sumBonus == 0:
-                sumBonus = intRollData[2]
+    def RollNum(self, rollText: str | None = None, *, xD: int | None = None, Dy: int | None = None, sumBonus: int = 0, bonus: int = 0, success: int | None = None, whyJudged: str = ""):
+        if Dy is None:
+            if rollText is not None:
+                intRollData = self.RollNumRegTools(rollText)
 
-        except ValueError as e:
-            raise rollTextNotMatchTheStructure
+                xD, Dy = [intRollData[0], intRollData[1]]
+                if sumBonus == 0:
+                    sumBonus = intRollData[2]
+            else:
+                logger.warning(
+                    "Dy is None and rollText is None")
+                raise ValueError(
+                    "Dy is None and rollText is None")
+
+        if xD is None:
+            xD = 1
         rollValueList: list[int] = []
         returnValueList: list[dict] = []
         whyJudged = self.__rollTextReplace(whyJudged)
@@ -245,11 +246,20 @@ class Roll:
         return {
             "rollValueList": rollValueList,
             "Type": self.rollType,
-            "returnValueList": returnValueList,
-            "userReg": userReg,
+            "returnValueList": returnValueList
         }
 
     def RollList(self,  rollList: list[T], *,   whyJudged: str = "") -> T:
+        """RollList 的 Docstring
+        
+        :param self: 說明
+        :type self: 
+        :param rollList: 說明
+        :type rollList: 
+        :param whyJudged: 說明
+        :type whyJudged: str
+        :return: 說明
+        :rtype: Any"""
         r: T = self.__random_obj.choice(rollList)
         if self.debug:
             print("rollValue: ", r)
@@ -260,11 +270,11 @@ class Roll:
             print("="*20)
         return r
 
-    def getExpectedValue(self, values: list[int | float], probabilities: list[float]):
+    def getExpectedValue(self, values: list[int | float], probabilities: list[float]) -> float:
         """計算給定值和對應概率的期望值。
 
         Args:
-            values (list[int  |  float]): 一個包含數值的列表。
+            values (list[int | float]): 一個包含數值的列表。
             probabilities (list[float]): 對應於數值的概率列表。
 
         Raises:
@@ -274,17 +284,16 @@ class Roll:
         Returns:
             float: 計算出的期望值。
         """
-        # 導入 numpy 模塊
-        import numpy as np
         # 檢查 values 和 probabilities 的長度是否相等
         if len(values) != len(probabilities):
             raise ValueError(f"values 與 probabilities 長度不等。")
-        np_values = np.array(values)
-        np_probabilities = np.array(probabilities)
+
         # 確保概率之和為 1
-        if np.isclose(np_probabilities.sum(), 1):
-            # 計算期望值
-            expected_value = np.sum(np_values * np_probabilities)
-            return float(expected_value)
-        else:
+        total_probability: float = sum(probabilities)
+        if not (0.99 <= total_probability <= 1.01):  # 使用範圍來考慮浮點數誤差
             raise ValueError(f"概率之和並不等於 1，請檢查概率分配。")
+
+        # 計算期望值
+        expected_value: float = sum(
+            v * p for v, p in zip(values, probabilities))
+        return expected_value

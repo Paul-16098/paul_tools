@@ -88,8 +88,11 @@ class I18n:
         text = raw.name if isinstance(raw, self.Langs) else raw
 
         langText = self.LANG_JSON.get(text)
-        if langText is not None:
-            return langText.format(*args, **kwargs)
-
         errText = f"{{ no {repr(text)} in lang file {repr(self.langs)} }}"
-        return errText
+        if langText is not None:
+            langText = langText.format(*args, **kwargs)
+            logger.debug(f"locale({raw}) -> {text} -> {langText}")
+            return langText
+        else:
+            logger.warning(f"locale({raw}) -> {text} -> {errText}")
+            return errText

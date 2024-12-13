@@ -1,3 +1,4 @@
+from .__init__ import *
 from typing import Any
 
 
@@ -137,3 +138,14 @@ class clipboard():
         """
         import pyperclip
         return pyperclip.paste()
+
+
+def use(obj: dict[str, Any]):
+    logger.debug(f"use({obj})--init")
+    for k, v in obj.items():
+        if globals()[k] is not None:
+            # raise
+            continue
+        logger.debug(f"k({repr(k)}), v({repr(v)})")
+        globals()[k] = v
+    logger.debug(f"use--end")
