@@ -110,7 +110,7 @@ def color(*value: Any, color: str = "") -> list[Any]:
 
 def typeToColor(type: str) -> str:
     match type.upper():
-        case "ERROE" | "ERR":
+        case "ERROR" | "ERR":
             return "RED"
         case "WARN" | "WARNING":
             return "YELLOW"

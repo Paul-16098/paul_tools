@@ -2,13 +2,12 @@ from .__init__ import *
 from ..I18n import I18n
 from ..Tools import color, typeToColor
 
-from typing import Callable, Any
+from typing import Any
 from time import sleep
-from pathlib import Path
 
 __all__ = ["retry"]
 
-i18n_obj = I18n(dirRoot=str(Path(__file__).parent), langJson={
+i18n_obj = I18n(langJson={
     "en_us": {
         "file_lang": "en_us",
         "updata": "2024/09/25 17:56 UTC+0800",

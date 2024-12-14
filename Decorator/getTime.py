@@ -2,7 +2,7 @@ from . import *
 from ..I18n import I18n
 
 from time import perf_counter
-from typing import Callable, Any
+from typing import Any
 from pathlib import Path
 
 

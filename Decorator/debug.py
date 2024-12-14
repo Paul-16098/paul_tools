@@ -4,7 +4,7 @@ from .__init__ import *
 __all__ = ["debug"]
 
 
-def debug(func):
+def debug(func: Callable):
     @functools.wraps(func)  # 保留原函數的元數據
     def wrapper(*args, **kwargs):
         print(

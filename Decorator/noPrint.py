@@ -18,7 +18,7 @@ class ContextManagersNoPrint:
         sys.stdout = self._original_stdout
 
 
-def noPrint(func):
+def noPrint(func: Callable):
     @functools.wraps(func)  # 保留原函數的元數據
     def wrapper(*args, **kwargs):
         with ContextManagersNoPrint():  # 使用上下文管理器禁用打印

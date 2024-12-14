@@ -1,3 +1,4 @@
 import functools
+from typing import Callable
 
 __version__ = "1.0.0"
