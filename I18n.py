@@ -31,8 +31,10 @@ class I18n:
         """
         lang = lang.replace("-", "_")
         if lang == "sys":
-            return I18n.langReplace(I18n.getSysLang())
-        return I18n.LANG_MAP.get(lang, lang)
+            logger.debug(f"langReplace({lang})-> {(r:=I18n.langReplace(I18n.getSysLang()))}")
+            return r
+        logger.debug(f"langReplace({lang})-> {(r:=I18n.LANG_MAP.get(lang, lang))}")
+        return r
 
     @staticmethod
     def getSysLang() -> str:
@@ -46,7 +48,8 @@ class I18n:
             str: The current system language code in lowercase.
         """
         """Get the current system language code."""
-        return str(locale.getlocale(locale.LC_CTYPE)[0]).lower()
+        logger.debug(f"getSysLang()-> {(r:=str(locale.getlocale(locale.LC_CTYPE)[0]).lower())}")
+        return r
 
     def __init__(self, Langs: list[str] = ["sys", "en_us"], dirRoot: str = os.getcwd(), langJson: dict[str, dict[str, str]] = {}) -> None:
         """
