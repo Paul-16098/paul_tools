@@ -11,25 +11,25 @@ __all__ = ["I18n"]
 
 
 class I18n:
-    """An internationalization (i18n) module for language translations.
-
-    This module manages the loading and retrieval of localized strings based on
-    the specified languages. It supports system language detection and fallback
-    to default language files.
-    By Paul-16098
-    """
-
     ver = "1.0.0.0"
 
     LANG_MAP = {
-        "sys": "sys",  # 這裡只設置為字符串，實際解析在需要時進行
         "zh": "zh_cn",
         "chinese (traditional)_hong kong sar": "zh_hk"
     }
 
     @staticmethod
     def langReplace(lang: str) -> str:
-        """Replace language keys with their respective codes."""
+        """
+        Replaces hyphens with underscores in the given language code and maps it to a standardized language code.
+
+        Args:
+            lang (str): The language code to be replaced.
+
+        Returns:
+            str: The standardized language code. If the input is "sys", it returns the system language code.
+        """
+        lang = lang.replace("-", "_")
         if lang == "sys":
             logger.debug(f"langReplace({lang})-> {(r:=I18n.langReplace(I18n.getSysLang()))}")
             return r
@@ -38,17 +38,39 @@ class I18n:
 
     @staticmethod
     def getSysLang() -> str:
+        """
+        Get the current system language code.
+
+        This function retrieves the current system language code using the locale settings
+        and returns it as a lowercase string.
+
+        Returns:
+            str: The current system language code in lowercase.
+        """
         """Get the current system language code."""
         logger.debug(f"getSysLang()-> {(r:=str(locale.getlocale(locale.LC_CTYPE)[0]).lower())}")
         return r
 
-    def __init__(self, Langs: list[str] | None = None, dirRoot: str = os.getcwd(), langJson: dict[str, dict[str, str]] = {}) -> None:
+    def __init__(self, Langs: list[str] = ["sys", "en_us"], dirRoot: str = os.getcwd(), langJson: dict[str, dict[str, str]] = {}) -> None:
+        """
+        Initialize the I18n class.
+        Args:
+            Langs (list[str]): A list of language codes to load. Defaults to ["sys", "en_us"].
+            dirRoot (str): The root directory where language files are stored. Defaults to the current working directory.
+            langJson (dict[str, dict[str, str]]): A dictionary containing language-specific JSON data to merge with the loaded files. Defaults to an empty dictionary.
+        Raises:
+            ValueError: If the Langs list is empty.
+        """
         self.DIR_ROOT = dirRoot
         self.DIR_LANGS_ROOT: str = os.path.join(self.DIR_ROOT, "langs")
         self.LANG_JSON: dict[str, str] = {}
 
-        self.langs = Langs if Langs is not None else ["sys", "en_us"]
-        self.langs = [self.langReplace(lang) for lang in self.langs]
+        if len(Langs) == 0:
+            raise ValueError("Langs must contain at least one language code.")
+        self.langs = [self.langReplace(lang) for lang in Langs]
+        logger.debug(f"langs: {self.langs}")
+        logger.debug(f"langJson: {langJson}")
+        logger.debug(f"DIR_LANGS_ROOT: {self.DIR_LANGS_ROOT}")
 
         # #tag load
         for lang in reversed(self.langs):
@@ -70,32 +92,53 @@ class I18n:
             # breakpoint()
             self.LANG_JSON.update(fileJson)
             self.LANG_JSON.update(langJson.get(lang, {}))
+        logger.debug(f"LANG_JSON: {self.LANG_JSON}")
 
     class Langs(Enum):
-        """An Enum for system language keys."""
+        """Enum class representing different language-related constants.
+        Attributes:
+            LANG_JSON (int): Constant representing a JSON language file.
+            updata (int): Constant representing an update action.
+            any (int): Constant representing any language.
+            file_lang (int): Constant representing a file language.
+        """
         LANG_JSON = -1
         updata = 0
         any = 1
         file_lang = 2
 
     def locale(self, raw: str | Langs, *args: object, **kwargs: object) -> str:
-        """Get language text based on provided key.
-
+        """Translates a given string or Langs enum to the corresponding localized string.
         Args:
-            raw (str | Langs): `Langs.XXX` or `"{file_name}__{class_name}__{func_name}__{id}"`
-            kwargs: Format arguments.
-
+            raw (str | Langs): The raw string or Langs enum to be translated.
+            *args (object): Positional arguments to format the translated string.
+            **kwargs (object): Keyword arguments to format the translated string.
         Returns:
-            str: Language text or an error message.
+            str: The localized and formatted string if found, otherwise the original string.
+        Raises:
+            IndexError: If there is an issue with formatting the string using the provided arguments.
+        Logs:
+            Warnings if the translation is not found or if there is an issue with formatting.
+            Debug information about the translation process.
         """
         text = raw.name if isinstance(raw, self.Langs) else raw
 
         langText = self.LANG_JSON.get(text)
-        errText = f"{{ no {repr(text)} in lang file {repr(self.langs)} }}"
+
+        # errText = f"{{ no {repr(text)} in lang file {repr(self.langs)} }}"
+        errText = text
         if langText is not None:
-            langText = langText.format(*args, **kwargs)
-            logger.debug(f"locale({raw}) -> {text} -> {langText}")
+            try:
+                langText = langText.format(*args, **kwargs)
+            except IndexError as e:
+                logger.warning(f"{repr(e)}: {repr(langText)
+                                             } -> {repr(args)} -> {repr(kwargs)}")
+            logger.debug(
+                f"locale({repr(raw)}) -> {repr(text)} -> {repr(langText)}")
             return langText
         else:
-            logger.warning(f"locale({raw}) -> {text} -> {errText}")
+            logger.warning(
+                f"locale({repr(raw)}) -> {repr(text)} -> {repr(errText)}")
             return errText
+
+    get = locale

@@ -38,7 +38,8 @@ class Roll:
         success = 1
         BigSuccess = 2
 
-    def __rollTextReplace(self, text: str) -> str:
+    @staticmethod
+    def rollTextReplace(text: str) -> str:
         """a func
 
         Args:
@@ -108,7 +109,7 @@ class Roll:
             userReg = rollTextStructure
             rollData = [tmp1.group(1), tmp1.group(3), tmp1.group(6)]
             break
-        if rollData is None:
+        if rollData is None or len(rollData) != 3:
             raise rollTextNotMatchTheStructure
         else:
             logger.debug(f"RollNumRegTools({repr(rollText)})--{userReg=}")
@@ -120,7 +121,7 @@ class Roll:
             rollData[2] = "0"
         for tmp1 in rollData:
             intRollData.append(int(tmp1))
-        logger.debug(f"RollNumRegTools({rollText})--{userReg=}-{intRollData=}")
+        logger.debug(f"RollNumRegTools({repr(rollText)})--{userReg=}-{intRollData=}")
         return intRollData
 
     def RollNum(self, rollText: str | None = None, *, xD: int | None = None, Dy: int | None = None, sumBonus: int = 0, bonus: int = 0, success: int | None = None, whyJudged: str = ""):
@@ -141,7 +142,7 @@ class Roll:
             xD = 1
         rollValueList: list[int] = []
         returnValueList: list[dict] = []
-        whyJudged = self.__rollTextReplace(whyJudged)
+        whyJudged = self.rollTextReplace(whyJudged)
 
         if self.debug:
             print(f"rollIntData: {xD}d{Dy}")
@@ -251,7 +252,7 @@ class Roll:
 
     def RollList(self,  rollList: list[T], *,   whyJudged: str = "") -> T:
         """RollList 的 Docstring
-        
+
         :param self: 說明
         :type self: 
         :param rollList: 說明
@@ -270,11 +271,11 @@ class Roll:
             print("="*20)
         return r
 
-    def getExpectedValue(self, values: list[int | float], probabilities: list[float]) -> float:
+    def getExpectedValue(self, values: list[int] | list[float], probabilities: list[float]) -> float:
         """計算給定值和對應概率的期望值。
 
         Args:
-            values (list[int | float]): 一個包含數值的列表。
+            values (list[int] | list[float]): 一個包含數值的列表。
             probabilities (list[float]): 對應於數值的概率列表。
 
         Raises:
