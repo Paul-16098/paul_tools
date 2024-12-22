@@ -11,7 +11,7 @@ i18n_obj = I18n(langJson={
     "en_us": {
         "file_lang": "en_us",
         "updata": "2024/09/25 17:56 UTC+0800",
-        "retry__Decorator__retry__ValueErrorText": "not retries < 1 or delay <= 0",
+        "retry__Decorator__retry__ValueErrorText": "retries not < 1 or delay not <= 0",
         "retry__Decorator__retry__run": "run({}): {}()",
         "retry__Decorator__retry__errFail": "Error: {},\"{}()\"Failed after {} retries.",
         "retry__Decorator__retry__err": "Error: {} -> Retrying..."
@@ -19,7 +19,7 @@ i18n_obj = I18n(langJson={
     "zh_hk": {
         "file_lang": "zh_hk",
         "updata": "2024/09/25 18:12 UTC+0800",
-        "retry__Decorator__retry__ValueErrorText": "retries < 1 or delay <= 0",
+        "retry__Decorator__retry__ValueErrorText": "重試次數不 < 1 或延遲不 <= 0",
         "retry__Decorator__retry__run": "\u904b\u884c({}): {}()",
         "retry__Decorator__retry__errFail": "\u932f\u8aa4\uff1a{},\"{}()\"\u91cd\u8a66 {} \u6b21\u5f8c\u5931\u6557\u3002",
         "retry__Decorator__retry__err": "\u932f\u8aa4\uff1a{} -> \u6b63\u5728\u91cd\u8a66({})..."
@@ -28,19 +28,6 @@ i18n_obj = I18n(langJson={
 
 
 def retry(retries: int = 3, delay: float = 1) -> Callable:
-    """_summary_
-
-    Args:
-        retries (int, optional): _description_. Defaults to 3.
-        delay (float, optional): _description_. Defaults to 1.
-
-    Raises:
-        ValueError: _description_
-
-    Returns:
-        Callable: _description_
-    """
-
     if retries < 1 or delay <= 0:
         raise ValueError(i18n_obj.locale(
             "retry__Decorator__retry__ValueErrorText"))

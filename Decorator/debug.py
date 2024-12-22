@@ -1,16 +1,19 @@
 from .__init__ import *
+from ..__init__ import logger
 
 
 __all__ = ["debug"]
 
 
-def debug(func: Callable):
-    @functools.wraps(func)  # 保留原函數的元數據
-    def wrapper(*args, **kwargs):
-        print(
-            f"before {func.__name__},args: {args},kwargs: {kwargs},locals: {locals()},globals: {globals()}")
-        r = func(*args, **kwargs)
-        print(
-            f"after {func.__name__}, result: {r}")
-        return r
-    return wrapper
+def debug(logFn: Callable = logger.debug) -> Callable:
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            logFn(
+                f"{func.__name__}#before: {globals(), locals()}")
+            r = func(*args, **kwargs)
+            logFn(f"{func.__name__}#after: {
+                globals(), locals()}, result: {r}")
+            return r
+        return wrapper
+    return decorator

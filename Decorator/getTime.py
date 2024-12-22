@@ -1,12 +1,11 @@
-from . import *
+from .__init__ import *
 from ..I18n import I18n
 
 from time import perf_counter
 from typing import Any
-from pathlib import Path
 
 
-i18n_obj = I18n(dirRoot=str(Path(__file__).parent), langJson={
+i18n_obj = I18n(langJson={
     "en_us": {
         "file_lang": "en_us",
         "updata": "2024/09/25 17:56 UTC+0800",
