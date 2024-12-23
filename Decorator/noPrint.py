@@ -2,20 +2,21 @@ from .__init__ import *
 
 import sys
 import os
+from contextlib import contextmanager
 
 
 __all__ = ["noPrint"]
 
 
-class ContextManagersNoPrint:
-    def __enter__(self):
-        self._original_stdout = sys.stdout
-        sys.stdout = open(os.devnull, 'w')
-        return self._original_stdout
+@contextmanager
+def ContextManagersNoPrint():
+    _original_stdout = sys.stdout
+    sys.stdout = open(os.devnull, 'w')
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        sys.stdout.close()
-        sys.stdout = self._original_stdout
+    yield _original_stdout
+
+    sys.stdout.close()
+    sys.stdout = _original_stdout
 
 
 def noPrint(func: Callable):
