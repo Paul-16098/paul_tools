@@ -10,5 +10,3 @@ if not DEBUG:
     logger.add("./log/log_paul-tools_{time}.log")
     logger.add(stdout, level=("DEBUG" if DEBUG else "INFO"),
                format="<level>{message}</level>")
-else:
-    pass
