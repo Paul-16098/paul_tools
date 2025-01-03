@@ -2,7 +2,7 @@ from .__init__ import *
 from .I18n import I18n
 from .Tools import color
 
-from typing import TypeVar
+from typing import TypeVar, TypedDict
 from random import Random
 from enum import Enum
 from pathlib import Path
@@ -10,43 +10,76 @@ import re
 import time
 
 
-__all__ = ["Roll"]
+__all__ = ["Roll", "RollType", "returnType",
+           "RollNumReturnType", "RollNumReturnValueType"]
 
 
 T = TypeVar("T")
 
 
+class RollType(Enum):
+    """the type of the roll.
+    """
+    NONE = 0
+
+    DND = 1
+    COC = 2
+
+
+class returnType(Enum):
+    """
+    An enumeration representing different return types for a function or process.
+
+    Attributes:
+        BigNotSuccess (int): Represents a significant failure with a value of -2.
+        notSuccess (int): Represents a failure with a value of -1.
+        NONE (int): Represents a neutral or no result with a value of 0.
+        success (int): Represents a success with a value of 1.
+        BigSuccess (int): Represents a significant success with a value of 2.
+    """
+    BigNotSuccess = -2
+    notSuccess = -1
+    NONE = 0
+    success = 1
+    BigSuccess = 2
+
+
+class RollNumReturnValueType(TypedDict):
+    Value: int
+    msg: str | None
+    RollValueClass: returnType
+
+
+class RollNumReturnType(TypedDict):
+    rollValueList: list[int]
+    Type: RollType
+    returnValueList: list[RollNumReturnValueType]
+
+
 class Roll:
-    rollNumTextStructureSet: set[str] = {
-        r"(\d*)(d|D)(\d+)(( +)?((\+|\-)(\d+)))?"
+    rollNumTextStructureSet: set[re.Pattern[str]] = {
+        re.compile(r"(\d*)(d|D)(\d+)(( +)?((\+|\-)(\d+)))?")
     }
-
-    class RollType(Enum):
-        """the type of the roll.
-        """
-        NONE = 0
-
-        DND = 1
-        COC = 2
-
-    class returnType(Enum):
-        """return type
-        """
-        BigNotSuccess = -2
-        notSuccess = -1
-        NONE = 0
-        success = 1
-        BigSuccess = 2
 
     @staticmethod
     def rollTextReplace(text: str) -> str:
-        """a func
+        """
+        Replaces specific keywords in the input text with their corresponding translations.
 
         Args:
-            text (str): input
+            text (str): The input text to be processed.
 
         Returns:
-            str: output
+            str: The processed text with replacements if applicable.
+
+        Replacements:
+            - "int" or "intelligence" -> "智力"
+            - "san" or "sanity" -> "理智"
+
+        If a replacement is made, a space is appended to the result.
+
+        Logs:
+            Logs the input text and the resulting text after processing.
         """
         isReplace: bool = True
         rText = text
@@ -61,7 +94,7 @@ class Roll:
         logger.debug(f"rollTextReplace({repr(text)}) -> {repr(rText)}")
         return rText
 
-    def __init__(self, debug: bool = False, seed: int | float | str | bytes | bytearray = time.time(),  rollType: RollType = RollType.NONE, logSum: bool = True, isLog: bool = True) -> None:
+    def __init__(self, debug: bool = False,  rollType: RollType = RollType.NONE, logSum: bool = True, isLog: bool = True, seed: int | float | str | bytes | bytearray = time.time()) -> None:
         self.debug = debug
         self.rollType = rollType
         self.logSum = logSum
@@ -84,9 +117,7 @@ class Roll:
         })
         self.__random_obj = Random()
         self.__random_obj.seed(self.__seed)
-
-        if self.debug:
-            print("random.seed: ", self.seed)
+        logger.debug(f"random.seed: {self.seed}")
 
     @property
     def seed(self) -> int | float | str | bytes | bytearray:
@@ -95,8 +126,8 @@ class Roll:
     @seed.setter
     def seed(self, seed: int | float | str | bytes | bytearray) -> None:
         self.__seed = seed
-        self.__random_obj.seed(seed)
-        logger.debug(f"set seed={self.seed}")
+        self.__random_obj.seed(self.__seed)
+        logger.debug(f"set seed={self.__seed}")
 
     def RollNumRegTools(self, rollText: str):
         rollTextNotMatchTheStructure = Exception(self.__i18n_obj.locale(
@@ -121,10 +152,11 @@ class Roll:
             rollData[2] = "0"
         for tmp1 in rollData:
             intRollData.append(int(tmp1))
-        logger.debug(f"RollNumRegTools({repr(rollText)})--{userReg=}-{intRollData=}")
+        logger.debug(
+            f"RollNumRegTools({repr(rollText)})--{userReg=}-{intRollData=}")
         return intRollData
 
-    def RollNum(self, rollText: str | None = None, *, xD: int | None = None, Dy: int | None = None, sumBonus: int = 0, bonus: int = 0, success: int | None = None, whyJudged: str = ""):
+    def RollNum(self, rollText: str | None = None, *, xD: int | None = None, Dy: int | None = None, sumBonus: int = 0, bonus: int = 0, success: int | None = None, whyJudged: str = "") -> RollNumReturnType:
         if Dy is None:
             if rollText is not None:
                 intRollData = self.RollNumRegTools(rollText)
@@ -141,11 +173,10 @@ class Roll:
         if xD is None:
             xD = 1
         rollValueList: list[int] = []
-        returnValueList: list[dict] = []
+        returnValueList: list[RollNumReturnValueType] = []
         whyJudged = self.rollTextReplace(whyJudged)
 
-        if self.debug:
-            print(f"rollIntData: {xD}d{Dy}")
+        logger.debug(f"rollIntData: {xD}d{Dy}")
 
         if self.isLog:
             print("="*20)
@@ -168,45 +199,45 @@ class Roll:
 
             addMsg: str = ""
             printColor: str = ""
-            RollValueClass = self.returnType.NONE
-            if self.rollType != self.RollType.NONE:
+            RollValueClass = returnType.NONE
+            if self.rollType != RollType.NONE:
                 if (success != None):
-                    if self.rollType == self.RollType.DND:
+                    if self.rollType == RollType.DND:
                         if trueRollValue >= success:
                             addMsg = f" [{whyJudged}成功]"
                             printColor = "GREEN"
-                            RollValueClass = self.returnType.success
+                            RollValueClass = returnType.success
                         elif trueRollValue < success:
                             addMsg = f" [{whyJudged}失敗]"
                             printColor = "red"
-                            RollValueClass = self.returnType.notSuccess
-                    elif self.rollType == self.RollType.COC:
+                            RollValueClass = returnType.notSuccess
+                    elif self.rollType == RollType.COC:
                         if trueRollValue < success:
                             addMsg = f" [{whyJudged}成功]"
                             printColor = "GREEN"
-                            RollValueClass = self.returnType.success
+                            RollValueClass = returnType.success
                         else:
                             addMsg = f" [{whyJudged}失敗]"
                             printColor = "red"
-                            RollValueClass = self.returnType.notSuccess
-                if self.rollType == self.RollType.DND and Dy == 20:
+                            RollValueClass = returnType.notSuccess
+                if self.rollType == RollType.DND and Dy == 20:
                     if rollValue == 20:
                         addMsg = f" [{whyJudged}大成功!]"
                         printColor = "LIGHTGREEN_EX"
-                        RollValueClass = self.returnType.BigSuccess
+                        RollValueClass = returnType.BigSuccess
                     elif rollValue == 1:
                         addMsg = f" [{whyJudged}大失敗!]"
                         printColor = "LIGHTRED_EX"
-                        RollValueClass = self.returnType.BigNotSuccess
-                if self.rollType == self.RollType.COC and Dy == 100:
+                        RollValueClass = returnType.BigNotSuccess
+                if self.rollType == RollType.COC and Dy == 100:
                     if rollValue == 0:
                         addMsg = f" [{whyJudged}大成功!]"
                         printColor = "LIGHTGREEN_EX"
-                        RollValueClass = self.returnType.BigSuccess
+                        RollValueClass = returnType.BigSuccess
                     elif rollValue == 100:
                         addMsg = f" [{whyJudged}大失敗!]"
                         printColor = "LIGHTRED_EX"
-                        RollValueClass = self.returnType.BigNotSuccess
+                        RollValueClass = returnType.BigNotSuccess
             msg: str | None = None
             if self.isLog:
                 msgBonus = ""

@@ -24,21 +24,20 @@ class JsonEditor:
             Interactively edits the JSON dictionary.
     """
 
-    def __init__(self, path: str):
+    def __init__(self, path: str|None = None):
         """
-        Initializes the Tools class.
+        Initializes the JsonEditor instance.
         Args:
-            name (str | None): The name to be used for the JSON file. If None or an empty string is provided,
-                               the user will be prompted to input a name.
+            path (str | None): The path to the JSON file. If None, the user will be prompted to enter the path.
         Attributes:
             json (module): The imported json module.
             os (module): The imported os module.
             time (module): The imported time module.
-            dirRoot (str): The root directory where the JSON file will be stored. Default is the current directory.
-            jsonDict (dict): A dictionary to store JSON data.
+            jsonDict (dict[str, str]): A dictionary to store JSON data.
+            dirRoot (str): The root directory, default is ".".
             jsonPath (str): The path to the JSON file.
         Raises:
-            FileNotFoundError: If the JSON file does not exist, a new file will be created with default content.
+            FileNotFoundError: If the JSON file is not found, a new file will be created.
         """
         import json
         import os
@@ -49,7 +48,7 @@ class JsonEditor:
         self.time = time
         self.jsonDict: dict[str, str] = {}
         self.dirRoot: str = "."
-
+ 
         if path is not None:
             self.jsonPath = path
         else:
@@ -123,8 +122,6 @@ class JsonEditor:
             while True:
                 print(self.jsonDict)
                 ip = input(">")
-                if ip is None:
-                    continue
                 match ip:
                     case "exit":
                         break
@@ -163,4 +160,3 @@ class JsonEditor:
                             logger.debug(f"jsonDict: {self.jsonDict}")
         except EOFError:
             logger.debug("EOF")
-            pass

@@ -63,13 +63,11 @@ def test_retry_invalid_parameters():
         r"(retries not < 1 or delay not <= 0|重試次數不 < 1 或延遲不 <= 0)")
     with pytest.raises(ValueError, match=reg):
         @retry(retries=0, delay=0.1)
-        def invalid_retries():
-            pass
+        def invalid_retries(): pass
 
     with pytest.raises(ValueError, match=reg):
         @retry(retries=3, delay=0)
-        def invalid_delay():
-            pass
+        def invalid_delay(): pass
 
 
 def test_retry_delay():
