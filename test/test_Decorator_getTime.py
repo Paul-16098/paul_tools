@@ -16,6 +16,8 @@ def test_getTime_prints_execution_time():
     - The output contains the execution time message in English or Chinese.
     - The sample function returns "Done".
     """
+    from ..Decorator.getTime import logger
+
     @getTime
     def sample_function():
         sleep(0.1)
@@ -23,7 +25,9 @@ def test_getTime_prints_execution_time():
 
     captured_output = StringIO()
     sys.stdout = captured_output
+    logger.add(captured_output, format="{message}")
     result = sample_function()
+    logger.remove()
     sys.stdout = sys.__stdout__
 
     output = captured_output.getvalue()

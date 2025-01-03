@@ -38,16 +38,16 @@ def retry(retries: int = 3, delay: float = 1) -> Callable:
             for i in range(1, retries + 1):
 
                 try:
-                    print(i18n_obj.locale(
+                    logger.info(i18n_obj.locale(
                         "retry__Decorator__retry__run", i, func.__name__))
                     return func(*args, **kwargs)
                 except Exception as e:
                     if i == retries:
-                        print(*color(i18n_obj.locale("retry__Decorator__retry__errFail", repr(
+                        logger.warning(*color(i18n_obj.locale("retry__Decorator__retry__errFail", repr(
                             e), func.__name__, retries), color=typeToColor("err")))
                         raise e
                     else:
-                        print(*color(i18n_obj.locale(
+                        logger.warning(*color(i18n_obj.locale(
                             "retry__Decorator__retry__err", repr(e), i), color=typeToColor("warn")))
                         sleep(delay)
 
