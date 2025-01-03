@@ -1,35 +1,7 @@
-from _pytest.compat import LEGACY_PATH
 from pytest import MonkeyPatch
 from .__init__ import *
 from ..Tools import *
-import json
-import os
 import pyperclip
-
-
-@pytest.mark.skip(reason="This test is not yet implemented.")
-def test_JsonEdit(monkeypatch: MonkeyPatch, tmpdir: LEGACY_PATH):
-    """
-    Test the JsonEdit function.
-    """
-
-    # Create a temporary directory for the JSON file
-    temp_dir = tmpdir.mkdir("json_test")
-    json_file = os.path.join(temp_dir, "test.json")
-
-    # Mock input to simulate user interaction
-    inputs = iter(["key1=value1", "key2=value2", "save",
-                  "key1", "del key1", "save", "EOF"])
-    monkeypatch.setattr('builtins.input', lambda _: next(inputs))
-
-    # Run the JsonEdit function
-    JsonEdit(name=str(json_file).replace(".json", ""))
-
-    # Verify the contents of the JSON file
-    with open(json_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
-        assert data["key2"] == "value2"
-        assert "key1" not in data
 
 
 def test_color():
@@ -65,19 +37,3 @@ def test_clipboard(monkeypatch: MonkeyPatch):
 
     clipboard.copy_to_clipboard("test text")
     assert clipboard.paste_from_clipboard() == "mocked text"
-
-
-@pytest.mark.skip(reason="This test is not yet implemented.")
-def test_use():
-    """
-    Test the use function.
-    """
-    global var1, var2
-    var1 = None
-    var2 = None
-
-    obj = {'var1': 10, 'var2': 'hello'}
-    use(obj)
-
-    assert globals()["var1"] == 10
-    assert globals()["var2"] == 'hello'

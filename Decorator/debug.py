@@ -1,5 +1,4 @@
 from .__init__ import *
-from ..__init__ import logger
 
 
 __all__ = ["debug"]

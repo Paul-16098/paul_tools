@@ -27,7 +27,7 @@ def getTime(func: Callable) -> Callable:
         result: Any = func(*args, **kwargs)
         end_time: float = perf_counter()
 
-        print(i18n_obj.locale("getTime__Decorator__getTime__log",
+        logger.info(i18n_obj.locale("getTime__Decorator__getTime__log",
               func.__name__, f"{end_time - start_time: .3f}"))
         return result
 
