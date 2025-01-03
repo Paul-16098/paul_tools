@@ -30,8 +30,12 @@ class TestJsonEditor:
         assert "key" not in json_editor.jsonDict
 
     def test_edit(self, monkeypatch, json_editor: JsonEditor):
-        inputs = iter(["key='value'", "save", "del key", "", "exit"])
+        inputs = iter(["key='value'", "key", "save", "del key",
+                      "key2='value2'", "del", "key2", "", "EOF", "^Z", "exit"])
         monkeypatch.setattr('builtins.input', lambda _: next(inputs, None))
-        monkeypatch.setattr('builtins.print', lambda _: None)
         json_editor.edit()
         assert json_editor.jsonDict == {}
+    def test_pathIsNone(self,monkeypatch,tmpdir):
+        inputs = iter([str(tmpdir / "test2.json"),"exit"])
+        monkeypatch.setattr('builtins.input', lambda _: next(inputs, None))
+        JsonEditor()
