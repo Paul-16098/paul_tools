@@ -1,6 +1,6 @@
 [project]
     name = "paul-tools"
-    version = "1.0.1"
+    version = "1.0.2"
     description = "一個簡單的lib"
     authors = [
         { name = "Paul-16098", email = "pl816098@gmail.com" },
