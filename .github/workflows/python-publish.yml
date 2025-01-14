@@ -36,35 +36,24 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
-          path: dist/
+          path: /
 
   pypi-publish:
     runs-on: ubuntu-latest
     needs:
       - release-build
     permissions:
-      # IMPORTANT: this permission is mandatory for trusted publishing
+      # IMPORTANT: 對於可信任發布來說，此權限是必要的
       id-token: write
 
-    # Dedicated environments with protections for publishing are strongly recommended.
-    # For more information, see: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#deployment-protection-rules
-    environment:
-      name: pypi
-      # OPTIONAL: uncomment and update to include your PyPI project URL in the deployment status:
-      # url: https://pypi.org/p/YOURPROJECT
-      #
-      # ALTERNATIVE: if your GitHub Release name is the PyPI project version string
-      # ALTERNATIVE: exactly, uncomment the following line instead:
-      # url: https://pypi.org/project/YOURPROJECT/${{ github.event.release.name }}
-
     steps:
-      - name: Retrieve release distributions
+      - name: 檢索發布發行版
         uses: actions/download-artifact@v4
         with:
           name: release-dists
-          path: dist/
+          path: /
 
-      - name: Publish release distributions to PyPI
+      - name: 將發行版發佈到 PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: dist/
+          packages-dir: /
