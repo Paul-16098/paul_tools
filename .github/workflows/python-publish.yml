@@ -27,7 +27,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
-          path: $GITHUB_WORKSPACE
+          path: $GITHUB_WORKSPACE/
 
   pypi-publish:
     runs-on: ubuntu-latest
