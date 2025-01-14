@@ -22,12 +22,14 @@ jobs:
       - name: Build release distributions
         run: |
           # NOTE: put your own distribution build steps here.
+          pip install poetry
+          poetry build
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
-          path: ../
+          path: dist/
 
   pypi-publish:
     runs-on: ubuntu-latest
@@ -42,8 +44,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: release-dists
+          path: dist/
 
       - name: 將發行版發佈到 PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: $GITHUB_WORKSPACE
+          packages-dir: dist/
