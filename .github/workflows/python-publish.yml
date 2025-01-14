@@ -1,9 +1,12 @@
 name: 上傳Python包
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
+  push: 
+    paths: pyproject.toml
+  pull_request: 
+    paths: pyproject.toml
+    types: [closed]
 
 permissions:
   contents: read
