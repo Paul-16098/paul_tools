@@ -1,5 +1,5 @@
 from .__init__ import *
-from ..Decorator.getTime import getTime
+from paul_tools.Decorator.getTime import getTime
 from time import sleep
 import sys
 from io import StringIO
@@ -16,7 +16,7 @@ def test_getTime_prints_execution_time():
     - The output contains the execution time message in English or Chinese.
     - The sample function returns "Done".
     """
-    from ..Decorator.getTime import logger
+    from paul_tools.Decorator.getTime import logger
 
     @getTime
     def sample_function():

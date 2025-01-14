@@ -1,6 +1,6 @@
 from .__init__ import *
 import json
-from ..JsonEditor import JsonEditor
+from paul_tools.JsonEditor import JsonEditor
 
 
 class TestJsonEditor:

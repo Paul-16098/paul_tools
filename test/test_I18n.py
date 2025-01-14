@@ -1,5 +1,5 @@
 from .__init__ import *
-from ..I18n import I18n
+from paul_tools.I18n import I18n
 
 
 def test_langReplace():

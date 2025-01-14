@@ -1,5 +1,5 @@
 from .__init__ import *
-from ..Decorator.retry import retry
+from paul_tools.Decorator.retry import retry
 from time import time
 
 

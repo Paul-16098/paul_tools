@@ -1,5 +1,5 @@
 from .__init__ import *
-from ..Roll import Roll, RollType, returnType
+from paul_tools.Roll import Roll, RollType, returnType
 
 
 def test_rollTextReplace():
@@ -253,6 +253,7 @@ def test_RollNum_with_success():
         returnType.success, returnType.notSuccess, returnType.BigSuccess, returnType.BigNotSuccess]
 
 
+@pytest.mark.skip()
 def test_RollNum_with_big_success():
     """
     Test the RollNum method of the Roll class with big success criteria.

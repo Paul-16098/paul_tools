@@ -1,5 +1,5 @@
 from .__init__ import *
-from ..Decorator.noPrint import noPrint
+from paul_tools.Decorator.noPrint import noPrint
 import sys
 from io import StringIO
 

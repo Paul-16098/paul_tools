@@ -1,6 +1,6 @@
 from pytest import MonkeyPatch
 from .__init__ import *
-from ..Tools import *
+from paul_tools.Tools import *
 import pyperclip
 
 

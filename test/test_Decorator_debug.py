@@ -1,5 +1,5 @@
 from .__init__ import *
-from ..Decorator.debug import debug
+from paul_tools.Decorator.debug import debug
 from io import StringIO
 
 
