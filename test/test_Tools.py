@@ -1,7 +1,5 @@
-from pytest import MonkeyPatch
 from .__init__ import *
 from paul_tools.Tools import *
-import pyperclip
 
 
 def test_color():
@@ -24,16 +22,3 @@ def test_typeToColor():
     assert typeToColor("WARN") == "YELLOW"
     assert typeToColor("WARNING") == "YELLOW"
     assert typeToColor("info") == "INFO"
-
-
-def test_clipboard(monkeypatch: MonkeyPatch):
-    """
-    Test the clipboard class.
-    """
-
-    # Mock pyperclip functions
-    monkeypatch.setattr(pyperclip, "copy", lambda text: None)
-    monkeypatch.setattr(pyperclip, "paste", lambda: "mocked text")
-
-    clipboard.copy_to_clipboard("test text")
-    assert clipboard.paste_from_clipboard() == "mocked text"

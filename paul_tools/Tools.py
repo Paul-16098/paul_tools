@@ -1,11 +1,10 @@
 from .__init__ import *
-from typing import Any
 
 
 DEBUG: bool = False
 
 
-__all__ = ["color", "typeToColor", "clipboard",]
+__all__ = ["color", "typeToColor", ]
 
 
 def color(*value: str, color: str = "") -> list[str]:
@@ -62,36 +61,3 @@ def typeToColor(type: str) -> str:
             return "YELLOW"
         case _:
             return type.upper()
-
-
-class clipboard():
-    """
-    A utility class for interacting with the system clipboard using the pyperclip library.
-    Methods
-    -------
-    copy_to_clipboard(text: str)
-        Copies the given text to the system clipboard.
-    paste_from_clipboard() -> str
-        Retrieves and returns the current text from the system clipboard.
-    """
-    @staticmethod
-    def copy_to_clipboard(text: str):
-        """
-        Copies the given text to the system clipboard.
-
-        Args:
-            text (str): The text to be copied to the clipboard.
-        """
-        import pyperclip
-        pyperclip.copy(text)
-
-    @staticmethod
-    def paste_from_clipboard():
-        """
-        Retrieve text from the system clipboard using the pyperclip module.
-
-        Returns:
-            str: The text currently stored in the system clipboard.
-        """
-        import pyperclip
-        return pyperclip.paste()

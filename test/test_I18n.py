@@ -75,3 +75,23 @@ def test_locale():
     assert i18n.locale("test_key") == "test_value {1}{arg}{0}"
     assert i18n.get("test_key") == "test_value {1}{arg}{0}"
     assert i18n.get == i18n.locale
+
+
+@pytest.fixture
+def new_file(tmp_path):
+    lang_dir = tmp_path / "langs"
+    lang_dir.mkdir()
+
+    # Create a temporary directory and file for testing
+    temp_en_us_file = lang_dir / "en_us.json"
+    temp_en_us_file.write_text('{"a":"b"}')
+
+    temp_zh_hk_file = lang_dir / "zh_hk.json"
+    temp_zh_hk_file.write_text('{"a":"c"')
+
+    return tmp_path
+
+
+def test_file_locale(new_file):
+    i18n = I18n(dirRoot=new_file, Langs=["en_us", "zh_hk", "None"])
+    assert i18n.get("a") == "b"

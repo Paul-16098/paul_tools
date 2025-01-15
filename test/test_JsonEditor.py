@@ -35,7 +35,14 @@ class TestJsonEditor:
         monkeypatch.setattr('builtins.input', lambda _: next(inputs, None))
         json_editor.edit()
         assert json_editor.jsonDict == {}
-    def test_pathIsNone(self,monkeypatch,tmpdir):
-        inputs = iter([str(tmpdir / "test2.json"),"exit"])
+
+    def test_pathIsNone(self, monkeypatch, tmpdir):
+        inputs = iter([str(tmpdir / "test2.json"), "exit"])
         monkeypatch.setattr('builtins.input', lambda _: next(inputs, None))
         JsonEditor()
+
+    def test_Err(self, monkeypatch, json_editor: JsonEditor):
+        def err(*args, **kwargs):
+            raise EOFError
+        monkeypatch.setattr('builtins.input', err)
+        json_editor.edit()
