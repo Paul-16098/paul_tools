@@ -41,6 +41,7 @@ def color(*value: str, color: str = "") -> list[str]:
     # 添加重置顏色碼
     new_value.append(colorama.Fore.RESET)
 
+    colorama.deinit()
     return new_value
 
 

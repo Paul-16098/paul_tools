@@ -93,6 +93,7 @@ class I18n:
             self.LANG_JSON.update(fileJson)
             self.LANG_JSON.update(langJson.get(lang, {}))
         logger.debug(f"LANG_JSON: {self.LANG_JSON}")
+        logger.debug(f"Initialized I18n with langs: {self.langs}")
 
     class Langs(Enum):
         """Enum class representing different language-related constants.

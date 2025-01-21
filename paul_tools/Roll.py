@@ -209,7 +209,7 @@ class Roll:
                             RollValueClass = returnType.success
                         elif trueRollValue < success:
                             addMsg = f" [{whyJudged}失敗]"
-                            printColor = "red"
+                            printColor = "RED"
                             RollValueClass = returnType.notSuccess
                     elif self.rollType == RollType.COC:
                         if trueRollValue < success:
@@ -218,7 +218,7 @@ class Roll:
                             RollValueClass = returnType.success
                         else:
                             addMsg = f" [{whyJudged}失敗]"
-                            printColor = "red"
+                            printColor = "RED"
                             RollValueClass = returnType.notSuccess
                 if self.rollType == RollType.DND and Dy == 20:
                     if rollValue == 20:
@@ -247,8 +247,7 @@ class Roll:
                         msgBonus = "+" + msgBonus
                     msgBonus += f" = {trueRollValue}"
 
-                msg = f"   {xD}d{Dy}:[{_i:>{len(str(xD))}}] = {rollValue:>0{len(str(Dy))}} {
-                    msgBonus}{addMsg}"
+                msg = f"   {xD}d{Dy}:[{_i:>{len(str(xD))}}] = {rollValue:>0{len(str(Dy))}} {msgBonus}{addMsg}"
 
                 print(*color(msg, color=printColor))
 
