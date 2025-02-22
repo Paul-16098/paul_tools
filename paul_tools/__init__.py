@@ -1,14 +1,15 @@
 __version__ = "1.0.0"
 
 
-def logger_init(DEBUG: bool = False, file: bool = True):
-    from loguru import logger
+def logger_init(DEBUG: bool = False):
     from sys import stdout
+
+    from loguru import logger
+
     logger.remove()
-    if file:
-        logger.add("./log/log_paul-tools_{time}.log")
-    logger.add(stdout, level=("DEBUG" if DEBUG else "INFO"),
-               format="<level>{message}</level>")
+    logger.add(
+        stdout, level=("DEBUG" if DEBUG else "INFO"), format="<level>{message}</level>"
+    )
     return logger
 
 

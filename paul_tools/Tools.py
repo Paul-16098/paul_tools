@@ -1,10 +1,10 @@
 from .__init__ import *
 
 
-DEBUG: bool = False
-
-
-__all__ = ["color", "typeToColor", ]
+__all__ = [
+    "color",
+    "typeToColor",
+]
 
 
 def color(*value: str, color: str = "") -> list[str]:
@@ -22,6 +22,7 @@ def color(*value: str, color: str = "") -> list[str]:
         ['\x1b[31m', 'Hello', 'World', '\x1b[39m']
     """
     import colorama
+
     colorama.init()
 
     # 將顏色轉換為大寫

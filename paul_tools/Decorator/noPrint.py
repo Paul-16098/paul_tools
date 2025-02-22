@@ -1,9 +1,8 @@
-from .__init__ import *
-
-import sys
 import os
+import sys
 from contextlib import contextmanager
 
+from .__init__ import *
 
 __all__ = ["noPrint"]
 
@@ -11,7 +10,7 @@ __all__ = ["noPrint"]
 @contextmanager
 def ContextManagersNoPrint():
     _original_stdout = sys.stdout
-    sys.stdout = open(os.devnull, 'w')
+    sys.stdout = open(os.devnull, "w")
 
     yield _original_stdout
 
@@ -24,4 +23,5 @@ def noPrint(func: Callable):
     def wrapper(*args, **kwargs):
         with ContextManagersNoPrint():  # 使用上下文管理器禁用打印
             return func(*args, **kwargs)
+
     return wrapper

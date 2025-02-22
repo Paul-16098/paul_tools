@@ -1,25 +1,29 @@
+import re
+import time
+from enum import Enum
+from pathlib import Path
+from random import Random
+from typing import TypedDict, TypeVar
+
 from .__init__ import *
 from .I18n import I18n
 from .Tools import color
 
-from typing import TypeVar, TypedDict
-from random import Random
-from enum import Enum
-from pathlib import Path
-import re
-import time
-
-
-__all__ = ["Roll", "RollType", "returnType",
-           "RollNumReturnType", "RollNumReturnValueType"]
+__all__ = [
+    "Roll",
+    "RollType",
+    "returnType",
+    "RollNumReturnType",
+    "RollNumReturnValueType",
+]
 
 
 T = TypeVar("T")
 
 
 class RollType(Enum):
-    """the type of the roll.
-    """
+    """the type of the roll."""
+
     NONE = 0
 
     DND = 1
@@ -37,6 +41,7 @@ class returnType(Enum):
         success (int): Represents a success with a value of 1.
         BigSuccess (int): Represents a significant success with a value of 2.
     """
+
     BigNotSuccess = -2
     notSuccess = -1
     NONE = 0
@@ -94,27 +99,37 @@ class Roll:
         logger.debug(f"rollTextReplace({repr(text)}) -> {repr(rText)}")
         return rText
 
-    def __init__(self, debug: bool = False,  rollType: RollType = RollType.NONE, logSum: bool = True, isLog: bool = True, seed: int | float | str | bytes | bytearray = time.time()) -> None:
+    def __init__(
+        self,
+        debug: bool = False,
+        rollType: RollType = RollType.NONE,
+        logSum: bool = True,
+        isLog: bool = True,
+        seed: int | float | str | bytes | bytearray = time.time(),
+    ) -> None:
         self.debug = debug
         self.rollType = rollType
         self.logSum = logSum
         self.isLog = isLog
         self.__seed = seed
 
-        self.__i18n_obj = I18n(dirRoot=str(Path(__file__).parent), langJson={
-            "en_us": {
-                "updata": "2024/5/24 12:56 UTC+8",
-                "any": "{}",
-                "file_lang": "en_us",
-                "paul_tools__Roll__Roll__Exception__rollText_Not_Match_The_Structure": "rollText will not ben {},will ben {}."
+        self.__i18n_obj = I18n(
+            dirRoot=str(Path(__file__).parent),
+            langJson={
+                "en_us": {
+                    "updata": "2024/5/24 12:56 UTC+8",
+                    "any": "{}",
+                    "file_lang": "en_us",
+                    "paul_tools__Roll__Roll__Exception__rollText_Not_Match_The_Structure": "rollText will not ben {},will ben {}.",
+                },
+                "zh_hk": {
+                    "updata": "2024/5/24 12:56 UTC+8",
+                    "any": "{}",
+                    "file_lang": "zh_hk",
+                    "paul_tools__Roll__Roll__Exception__rollText_Not_Match_The_Structure": "rollText 不是{}，而是{}。",
+                },
             },
-            "zh_hk": {
-                "updata": "2024/5/24 12:56 UTC+8",
-                "any": "{}",
-                "file_lang": "zh_hk",
-                "paul_tools__Roll__Roll__Exception__rollText_Not_Match_The_Structure": "rollText 不是{}，而是{}。"
-            },
-        })
+        )
         self.__random_obj = Random()
         self.__random_obj.seed(self.__seed)
         logger.debug(f"random.seed: {self.seed}")
@@ -130,8 +145,13 @@ class Roll:
         logger.debug(f"set seed={self.__seed}")
 
     def RollNumRegTools(self, rollText: str):
-        rollTextNotMatchTheStructure = Exception(self.__i18n_obj.locale(
-            "paul_tools__Roll__Roll__Exception__rollText_Not_Match_The_Structure", repr(rollText), repr(self.rollNumTextStructureSet)))
+        rollTextNotMatchTheStructure = Exception(
+            self.__i18n_obj.locale(
+                "paul_tools__Roll__Roll__Exception__rollText_Not_Match_The_Structure",
+                repr(rollText),
+                repr(self.rollNumTextStructureSet),
+            )
+        )
         rollData: list[str] | None = None
         userReg = None
         for rollTextStructure in self.rollNumTextStructureSet:
@@ -145,18 +165,27 @@ class Roll:
         else:
             logger.debug(f"RollNumRegTools({repr(rollText)})--{userReg=}")
 
-        if (rollData[0] == ""):
+        if rollData[0] == "":
             rollData[0] = "1"
         intRollData: list[int] = []
         if rollData[2] == None:
             rollData[2] = "0"
         for tmp1 in rollData:
             intRollData.append(int(tmp1))
-        logger.debug(
-            f"RollNumRegTools({repr(rollText)})--{userReg=}-{intRollData=}")
+        logger.debug(f"RollNumRegTools({repr(rollText)})--{userReg=}-{intRollData=}")
         return intRollData
 
-    def RollNum(self, rollText: str | None = None, *, xD: int | None = None, Dy: int | None = None, sumBonus: int = 0, bonus: int = 0, success: int | None = None, whyJudged: str = "") -> RollNumReturnType:
+    def RollNum(
+        self,
+        rollText: str | None = None,
+        *,
+        xD: int | None = None,
+        Dy: int | None = None,
+        sumBonus: int = 0,
+        bonus: int = 0,
+        success: int | None = None,
+        whyJudged: str = "",
+    ) -> RollNumReturnType:
         if Dy is None:
             if rollText is not None:
                 intRollData = self.RollNumRegTools(rollText)
@@ -165,10 +194,8 @@ class Roll:
                 if sumBonus == 0:
                     sumBonus = intRollData[2]
             else:
-                logger.warning(
-                    "Dy is None and rollText is None")
-                raise ValueError(
-                    "Dy is None and rollText is None")
+                logger.warning("Dy is None and rollText is None")
+                raise ValueError("Dy is None and rollText is None")
 
         if xD is None:
             xD = 1
@@ -179,17 +206,16 @@ class Roll:
         logger.debug(f"rollIntData: {xD}d{Dy}")
 
         if self.isLog:
-            print("="*20)
+            print("=" * 20)
             _ = f" {success=}" if success != None else ""
-            print(
-                f"Roll:> {whyJudged}({xD}d{Dy} {sumBonus:+}){_}")
+            print(f"Roll:> {whyJudged}({xD}d{Dy} {sumBonus:+}){_}")
             del _
 
         # 擲骰
         for i in range(xD):
-            _i = i+1
+            _i = i + 1
             rollValue = self.__random_obj.randint(1, Dy)
-            trueRollValue = rollValue+bonus
+            trueRollValue = rollValue + bonus
 
             ####
             # #tag DEBUG for debug
@@ -201,7 +227,7 @@ class Roll:
             printColor: str = ""
             RollValueClass = returnType.NONE
             if self.rollType != RollType.NONE:
-                if (success != None):
+                if success != None:
                     if self.rollType == RollType.DND:
                         if trueRollValue >= success:
                             addMsg = f" [{whyJudged}成功]"
@@ -243,7 +269,7 @@ class Roll:
                 msgBonus = ""
                 if bonus != 0:
                     msgBonus: str = str(bonus)
-                    if (msgBonus[0] != "-"):
+                    if msgBonus[0] != "-":
                         msgBonus = "+" + msgBonus
                     msgBonus += f" = {trueRollValue}"
 
@@ -251,11 +277,9 @@ class Roll:
 
                 print(*color(msg, color=printColor))
 
-            returnValueList.append({
-                "Value": trueRollValue,
-                "msg": msg,
-                "RollValueClass": RollValueClass
-            })
+            returnValueList.append(
+                {"Value": trueRollValue, "msg": msg, "RollValueClass": RollValueClass}
+            )
             rollValueList.append(trueRollValue)
             if self.debug:
                 print(("rollValueList: ", rollValueList))
@@ -265,28 +289,28 @@ class Roll:
             msgSumBonus = ""
             if sumBonus != 0:
                 msgSumBonus = str(sumBonus)
-                if (msgSumBonus[0] != "-"):
+                if msgSumBonus[0] != "-":
                     msgSumBonus = "+" + msgSumBonus
-                msgSumBonus = " "+msgSumBonus
-                msgSumBonus += f" = {_+sumBonus}"
+                msgSumBonus = " " + msgSumBonus
+                msgSumBonus += f" = {_ + sumBonus}"
             if self.logSum:
                 print(f"sum = {_}{msgSumBonus}")
-            print(f"X̄ = {_/len(rollValueList):.2f}")
-            print("="*20)
+            print(f"X̄ = {_ / len(rollValueList):.2f}")
+            print("=" * 20)
 
         return {
             "rollValueList": rollValueList,
             "Type": self.rollType,
-            "returnValueList": returnValueList
+            "returnValueList": returnValueList,
         }
 
-    def RollList(self,  rollList: list[T], *,   whyJudged: str = "") -> T:
+    def RollList(self, rollList: list[T], *, whyJudged: str = "") -> T:
         """RollList 的 Docstring
 
         :param self: 說明
-        :type self: 
+        :type self:
         :param rollList: 說明
-        :type rollList: 
+        :type rollList:
         :param whyJudged: 說明
         :type whyJudged: str
         :return: 說明
@@ -295,13 +319,15 @@ class Roll:
         if self.debug:
             print("rollValue: ", r)
         if self.isLog:
-            print("="*20)
-            print(f"Roll List:> {whyJudged}({" ".join(map(str, rollList))})")
+            print("=" * 20)
+            print(f"Roll List:> {whyJudged}({' '.join(map(str, rollList))})")
             print(f"    r={r}")
-            print("="*20)
+            print("=" * 20)
         return r
 
-    def getExpectedValue(self, values: list[int] | list[float], probabilities: list[float]) -> float:
+    def getExpectedValue(
+        self, values: list[int] | list[float], probabilities: list[float]
+    ) -> float:
         """計算給定值和對應概率的期望值。
 
         Args:
@@ -325,6 +351,5 @@ class Roll:
             raise ValueError(f"概率之和並不等於 1，請檢查概率分配。")
 
         # 計算期望值
-        expected_value: float = sum(
-            v * p for v, p in zip(values, probabilities))
+        expected_value: float = sum(v * p for v, p in zip(values, probabilities))
         return expected_value

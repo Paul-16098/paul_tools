@@ -1,6 +1,5 @@
 from .__init__ import *
 
-
 __all__ = ["JsonEditor"]
 
 
@@ -24,7 +23,7 @@ class JsonEditor:
             Interactively edits the JSON dictionary.
     """
 
-    def __init__(self, path: str|None = None):
+    def __init__(self, path: str | None = None):
         """
         Initializes the JsonEditor instance.
         Args:
@@ -48,7 +47,7 @@ class JsonEditor:
         self.time = time
         self.jsonDict: dict[str, str] = {}
         self.dirRoot: str = "."
- 
+
         if path is not None:
             self.jsonPath = path
         else:
@@ -118,6 +117,7 @@ class JsonEditor:
             EOFError: When the end of input is reached.
         """
         import re
+
         try:
             while True:
                 print(self.jsonDict)
@@ -154,9 +154,9 @@ class JsonEditor:
                         elif value is None:
                             logger.info(f"<{self.jsonDict.get(key, None)}")
                         else:
-                            self.jsonDict.update({
-                                key: eval(value, globals={}, locals={})
-                            })
+                            self.jsonDict.update(
+                                {key: eval(value, globals={}, locals={})}
+                            )
                             logger.debug(f"jsonDict: {self.jsonDict}")
         except EOFError:
             logger.debug("EOF")

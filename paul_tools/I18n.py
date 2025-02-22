@@ -1,11 +1,10 @@
-from .__init__ import *
-
-# i18n
 import json
 import locale
-from enum import Enum
 import os
 import time
+from enum import Enum
+
+from .__init__ import *
 
 __all__ = ["I18n"]
 
@@ -13,10 +12,7 @@ __all__ = ["I18n"]
 class I18n:
     ver = "1.0.0.0"
 
-    LANG_MAP = {
-        "zh": "zh_cn",
-        "chinese (traditional)_hong kong sar": "zh_hk"
-    }
+    LANG_MAP = {"zh": "zh_cn", "chinese (traditional)_hong kong sar": "zh_hk"}
 
     @staticmethod
     def langReplace(lang: str) -> str:
@@ -31,9 +27,11 @@ class I18n:
         """
         lang = lang.replace("-", "_")
         if lang == "sys":
-            logger.debug(f"langReplace({lang})-> {(r:=I18n.langReplace(I18n.getSysLang()))}")
+            logger.debug(
+                f"langReplace({lang})-> {(r := I18n.langReplace(I18n.getSysLang()))}"
+            )
             return r
-        logger.debug(f"langReplace({lang})-> {(r:=I18n.LANG_MAP.get(lang, lang))}")
+        logger.debug(f"langReplace({lang})-> {(r := I18n.LANG_MAP.get(lang, lang))}")
         return r
 
     @staticmethod
@@ -48,10 +46,17 @@ class I18n:
             str: The current system language code in lowercase.
         """
         """Get the current system language code."""
-        logger.debug(f"getSysLang()-> {(r:=str(locale.getlocale(locale.LC_CTYPE)[0]).lower())}")
+        logger.debug(
+            f"getSysLang()-> {(r := str(locale.getlocale(locale.LC_CTYPE)[0]).lower())}"
+        )
         return r
 
-    def __init__(self, Langs: list[str] = ["sys", "en_us"], dirRoot: str = os.getcwd(), langJson: dict[str, dict[str, str]] = {}) -> None:
+    def __init__(
+        self,
+        Langs: list[str] = ["sys", "en_us"],
+        dirRoot: str = os.getcwd(),
+        langJson: dict[str, dict[str, str]] = {},
+    ) -> None:
         """
         Initialize the I18n class.
         Args:
@@ -82,7 +87,11 @@ class I18n:
                 "file_lang": lang,
             }
             try:
-                with open(os.path.join(self.DIR_LANGS_ROOT, f"{lang}.json"), "r", encoding="utf8") as f:
+                with open(
+                    os.path.join(self.DIR_LANGS_ROOT, f"{lang}.json"),
+                    "r",
+                    encoding="utf8",
+                ) as f:
                     fileJson = json.load(f)
             except FileNotFoundError:
                 fileJson = dF  # 使用默認值
@@ -103,6 +112,7 @@ class I18n:
             any (int): Constant representing any language.
             file_lang (int): Constant representing a file language.
         """
+
         LANG_JSON = -1
         updata = 0
         any = 1
@@ -132,14 +142,13 @@ class I18n:
             try:
                 langText = langText.format(*args, **kwargs)
             except IndexError as e:
-                logger.warning(f"{repr(e)}: {repr(langText)
-                                             } -> {repr(args)} -> {repr(kwargs)}")
-            logger.debug(
-                f"locale({repr(raw)}) -> {repr(text)} -> {repr(langText)}")
+                logger.warning(
+                    f"{repr(e)}: {repr(langText)} -> {repr(args)} -> {repr(kwargs)}"
+                )
+            logger.debug(f"locale({repr(raw)}) -> {repr(text)} -> {repr(langText)}")
             return langText
         else:
-            logger.warning(
-                f"locale({repr(raw)}) -> {repr(text)} -> {repr(errText)}")
+            logger.warning(f"locale({repr(raw)}) -> {repr(text)} -> {repr(errText)}")
             return errText
 
     get = locale

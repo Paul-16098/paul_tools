@@ -1,5 +1,6 @@
 # 定義模組的所有導出成員
-__all__ = ['list']
+__all__ = ["list"]
+
 
 # 自定義列表類，繼承自內建的 list 類
 class _list(list):
