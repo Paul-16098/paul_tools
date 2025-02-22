@@ -5,7 +5,7 @@ from pathlib import Path
 from random import Random
 from typing import TypedDict, TypeVar
 
-from .__init__ import *
+from .__init__ import logger
 from .I18n import I18n
 from .Tools import color
 
@@ -155,7 +155,7 @@ class Roll:
         rollData: list[str] | None = None
         userReg = None
         for rollTextStructure in self.rollNumTextStructureSet:
-            if (tmp1 := re.search(rollTextStructure, rollText)) == None:
+            if (tmp1 := re.search(rollTextStructure, rollText)) is None:
                 continue
             userReg = rollTextStructure
             rollData = [tmp1.group(1), tmp1.group(3), tmp1.group(6)]
@@ -168,7 +168,7 @@ class Roll:
         if rollData[0] == "":
             rollData[0] = "1"
         intRollData: list[int] = []
-        if rollData[2] == None:
+        if rollData[2] is None:
             rollData[2] = "0"
         for tmp1 in rollData:
             intRollData.append(int(tmp1))
@@ -207,7 +207,7 @@ class Roll:
 
         if self.isLog:
             print("=" * 20)
-            _ = f" {success=}" if success != None else ""
+            _ = f" {success=}" if success is not None else ""
             print(f"Roll:> {whyJudged}({xD}d{Dy} {sumBonus:+}){_}")
             del _
 
@@ -227,7 +227,7 @@ class Roll:
             printColor: str = ""
             RollValueClass = returnType.NONE
             if self.rollType != RollType.NONE:
-                if success != None:
+                if success is not None:
                     if self.rollType == RollType.DND:
                         if trueRollValue >= success:
                             addMsg = f" [{whyJudged}成功]"
@@ -343,12 +343,12 @@ class Roll:
         """
         # 檢查 values 和 probabilities 的長度是否相等
         if len(values) != len(probabilities):
-            raise ValueError(f"values 與 probabilities 長度不等。")
+            raise ValueError("values 與 probabilities 長度不等。")
 
         # 確保概率之和為 1
         total_probability: float = sum(probabilities)
         if not (0.99 <= total_probability <= 1.01):  # 使用範圍來考慮浮點數誤差
-            raise ValueError(f"概率之和並不等於 1，請檢查概率分配。")
+            raise ValueError("概率之和並不等於 1，請檢查概率分配。")
 
         # 計算期望值
         expected_value: float = sum(v * p for v, p in zip(values, probabilities))

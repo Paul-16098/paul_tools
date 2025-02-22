@@ -1,5 +1,6 @@
-from .__init__ import *
 from paul_tools.good_list import list
+
+from .__init__ import pytest
 
 
 def test_join():

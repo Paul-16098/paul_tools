@@ -1,7 +1,9 @@
-from .__init__ import *
-from paul_tools.Decorator.noPrint import noPrint
 import sys
 from io import StringIO
+
+from paul_tools.Decorator.noPrint import noPrint
+
+from .__init__ import pytest
 
 
 def test_noPrint_no_output():
@@ -13,6 +15,7 @@ def test_noPrint_no_output():
     Asserts:
         The captured output is an empty string, indicating no output was printed.
     """
+
     @noPrint
     def print_something():
         print("This should not be printed")
@@ -32,6 +35,7 @@ def test_noPrint_return_value():
     It then calls the decorated function and asserts that the return value is still "Expected Value".
     The purpose of this test is to verify that the `noPrint` decorator does not alter the return value of the function it decorates.
     """
+
     @noPrint
     def return_value():
         return "Expected Value"
@@ -43,13 +47,14 @@ def test_noPrint_return_value():
 def test_noPrint_exception_handling():
     """
     Test the `noPrint` decorator to ensure it correctly handles exceptions.
-    This test defines a function `raise_exception` decorated with `noPrint` 
-    that raises a `ValueError`. It then uses `pytest.raises` to assert that 
+    This test defines a function `raise_exception` decorated with `noPrint`
+    that raises a `ValueError`. It then uses `pytest.raises` to assert that
     the `ValueError` is raised with the expected error message.
-    The `noPrint` decorator is expected to suppress any print statements 
-    within the decorated function, but it should not interfere with the 
+    The `noPrint` decorator is expected to suppress any print statements
+    within the decorated function, but it should not interfere with the
     exception being raised and propagated.
     """
+
     @noPrint
     def raise_exception():
         raise ValueError("This is an error")

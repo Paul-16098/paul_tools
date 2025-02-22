@@ -1,6 +1,8 @@
-from .__init__ import *
 import json
+
 from paul_tools.JsonEditor import JsonEditor
+
+from .__init__ import pytest
 
 
 class TestJsonEditor:
@@ -10,7 +12,7 @@ class TestJsonEditor:
         temp_dir = tmp_path / "json_files"
         temp_dir.mkdir()
         temp_file = temp_dir / "test.json"
-        temp_file.write_text('{}')
+        temp_file.write_text("{}")
         return JsonEditor(path=temp_file)
 
     def test_init(self, json_editor: JsonEditor, tmp_path):
@@ -30,19 +32,33 @@ class TestJsonEditor:
         assert "key" not in json_editor.jsonDict
 
     def test_edit(self, monkeypatch, json_editor: JsonEditor):
-        inputs = iter(["key='value'", "key", "save", "del key",
-                      "key2='value2'", "del", "key2", "", "EOF", "^Z", "exit"])
-        monkeypatch.setattr('builtins.input', lambda _: next(inputs, None))
+        inputs = iter(
+            [
+                "key='value'",
+                "key",
+                "save",
+                "del key",
+                "key2='value2'",
+                "del",
+                "key2",
+                "",
+                "EOF",
+                "^Z",
+                "exit",
+            ]
+        )
+        monkeypatch.setattr("builtins.input", lambda _: next(inputs, None))
         json_editor.edit()
         assert json_editor.jsonDict == {}
 
     def test_pathIsNone(self, monkeypatch, tmpdir):
         inputs = iter([str(tmpdir / "test2.json"), "exit"])
-        monkeypatch.setattr('builtins.input', lambda _: next(inputs, None))
+        monkeypatch.setattr("builtins.input", lambda _: next(inputs, None))
         JsonEditor()
 
     def test_Err(self, monkeypatch, json_editor: JsonEditor):
         def err(*args, **kwargs):
             raise EOFError
-        monkeypatch.setattr('builtins.input', err)
+
+        monkeypatch.setattr("builtins.input", err)
         json_editor.edit()

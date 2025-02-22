@@ -2,7 +2,7 @@ from time import perf_counter
 from typing import Any
 
 from ..I18n import I18n
-from .__init__ import *
+from .__init__ import Callable, functools, logger
 
 i18n_obj = I18n(
     langJson={

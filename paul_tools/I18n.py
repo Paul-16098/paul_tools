@@ -4,7 +4,7 @@ import os
 import time
 from enum import Enum
 
-from .__init__ import *
+from .__init__ import logger
 
 __all__ = ["I18n"]
 

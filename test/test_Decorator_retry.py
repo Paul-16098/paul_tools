@@ -1,6 +1,8 @@
-from .__init__ import *
-from paul_tools.Decorator.retry import retry
 from time import time
+
+from paul_tools.Decorator.retry import retry
+
+from .__init__ import pytest
 
 
 def test_retry_success():
@@ -59,15 +61,21 @@ def test_retry_invalid_parameters():
         r"(retries not < 1 or delay not <= 0|重試次數不 < 1 或延遲不 <= 0)"
     """
     import re
+
     reg = re.compile(
-        r"(retries not < 1 or delay not <= 0|重試次數不 < 1 或延遲不 <= 0)")
+        r"(retries not < 1 or delay not <= 0|重試次數不 < 1 或延遲不 <= 0)"
+    )
     with pytest.raises(ValueError, match=reg):
+
         @retry(retries=0, delay=0.1)
-        def invalid_retries(): pass  # pragma: no cover
+        def invalid_retries():
+            pass  # pragma: no cover
 
     with pytest.raises(ValueError, match=reg):
+
         @retry(retries=3, delay=0)
-        def invalid_delay(): pass  # pragma: no cover
+        def invalid_delay():
+            pass  # pragma: no cover
 
 
 def test_retry_delay():

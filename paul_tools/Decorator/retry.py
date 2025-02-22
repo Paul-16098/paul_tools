@@ -3,7 +3,7 @@ from typing import Any
 
 from ..I18n import I18n
 from ..Tools import color, typeToColor
-from .__init__ import *
+from .__init__ import Callable, functools, logger
 
 __all__ = ["retry"]
 

@@ -1,5 +1,6 @@
-from .__init__ import *
-from paul_tools.Tools import *
+from paul_tools.Tools import color, typeToColor
+
+from .__init__ import pytest
 
 
 def test_color():
@@ -7,7 +8,11 @@ def test_color():
     Test the color function.
     """
     assert color("Hello", "World", color="red") == [
-        '\x1b[31m', 'Hello', 'World', '\x1b[39m']
+        "\x1b[31m",
+        "Hello",
+        "World",
+        "\x1b[39m",
+    ]
     assert color("Hello", "World") == ["Hello", "World"]
     with pytest.raises(ValueError):
         color("Hello", "World", color="invalid_color")

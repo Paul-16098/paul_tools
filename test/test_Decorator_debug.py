@@ -1,6 +1,8 @@
-from .__init__ import *
-from paul_tools.Decorator.debug import debug
 from io import StringIO
+
+from paul_tools.Decorator.debug import debug
+
+from .__init__ import pytest
 
 
 def test_debug_logs_correct_messages():
@@ -20,6 +22,7 @@ def test_debug_logs_correct_messages():
         - "result: 5" is in the log contents.
         - The result of `sample_function(2, 3)` is 5.
     """
+
     @debug(logFn=lambda x: print(x, file=log_stream))
     def sample_function(x: int | float, y: int | float) -> int | float:
         return x + y
@@ -47,6 +50,7 @@ def test_debug_return_value():
     Assertions:
         - The result of calling `return_value()` should be "Expected Value".
     """
+
     @debug()
     def return_value():
         return "Expected Value"
@@ -68,6 +72,7 @@ def test_debug_exception_handling():
         - A ValueError with the message "This is an error" is raised when
           `raise_exception` is called.
     """
+
     @debug()
     def raise_exception():
         raise ValueError("This is an error")

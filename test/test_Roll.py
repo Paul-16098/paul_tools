@@ -1,6 +1,8 @@
 from random import Random
-from .__init__ import *
+
 from paul_tools.Roll import Roll, RollType, returnType
+
+from .__init__ import pytest
 
 
 def test_rollTextReplace():
@@ -250,7 +252,11 @@ def test_RollNum_with_success():
     assert "Type" in result
     assert "returnValueList" in result
     assert result["returnValueList"][0]["RollValueClass"] in [
-        returnType.success, returnType.notSuccess, returnType.BigSuccess, returnType.BigNotSuccess]
+        returnType.success,
+        returnType.notSuccess,
+        returnType.BigSuccess,
+        returnType.BigNotSuccess,
+    ]
 
 
 def test_RollDNDNumWithBigSuccess(monkeypatch):

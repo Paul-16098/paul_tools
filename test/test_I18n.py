@@ -1,5 +1,6 @@
-from .__init__ import *
 from paul_tools.I18n import I18n
+
+from .__init__ import pytest
 
 
 def test_langReplace():
@@ -48,8 +49,11 @@ def test_init():
     with pytest.raises(ValueError):
         I18n(Langs=[])
 
-    i18n = I18n(Langs=["en_us"], dirRoot="test_dir", langJson={
-                "en_us": {"test_key": "test_value"}})
+    i18n = I18n(
+        Langs=["en_us"],
+        dirRoot="test_dir",
+        langJson={"en_us": {"test_key": "test_value"}},
+    )
     assert i18n.DIR_ROOT == "test_dir"
     assert i18n.langs == ["en_us"]
     assert i18n.LANG_JSON["test_key"] == "test_value"
@@ -67,10 +71,12 @@ def test_locale():
     Additionally, it includes a nested function to test language replacement:
     - Checks if the langReplace method correctly replaces language codes.
     """
-    i18n = I18n(Langs=["en_us"], langJson={
-                "en_us": {"test_key": "test_value {1}{arg}{0}"}})
-    assert i18n.locale(
-        "test_key", "a0", "a1", arg="argument") == "test_value a1argumenta0"
+    i18n = I18n(
+        Langs=["en_us"], langJson={"en_us": {"test_key": "test_value {1}{arg}{0}"}}
+    )
+    assert (
+        i18n.locale("test_key", "a0", "a1", arg="argument") == "test_value a1argumenta0"
+    )
     assert i18n.locale("non_existent_key") == "non_existent_key"
     assert i18n.locale("test_key") == "test_value {1}{arg}{0}"
     assert i18n.get("test_key") == "test_value {1}{arg}{0}"

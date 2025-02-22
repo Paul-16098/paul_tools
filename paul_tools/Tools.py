@@ -1,6 +1,3 @@
-from .__init__ import *
-
-
 __all__ = [
     "color",
     "typeToColor",

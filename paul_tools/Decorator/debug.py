@@ -1,4 +1,4 @@
-from .__init__ import *
+from .__init__ import Callable, logger, functools
 
 __all__ = ["debug"]
 

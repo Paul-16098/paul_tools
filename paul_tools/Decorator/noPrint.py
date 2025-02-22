@@ -2,7 +2,7 @@ import os
 import sys
 from contextlib import contextmanager
 
-from .__init__ import *
+from .__init__ import Callable, functools
 
 __all__ = ["noPrint"]
 

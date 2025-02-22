@@ -1,8 +1,10 @@
-from .__init__ import *
-from paul_tools.Decorator.getTime import getTime
-from time import sleep
 import sys
 from io import StringIO
+from time import sleep
+
+from paul_tools.Decorator.getTime import getTime
+
+from .__init__ import pytest
 
 
 def test_getTime_prints_execution_time():
@@ -42,6 +44,7 @@ def test_getTime_return_value():
     This test defines a function `return_value` that returns a string "Expected Value" and decorates it with `getTime`.
     It then calls the decorated function and asserts that the return value is still "Expected Value".
     """
+
     @getTime
     def return_value():
         return "Expected Value"
@@ -60,6 +63,7 @@ def test_getTime_exception_handling():
     Raises:
         ValueError: If the exception is not raised or the message does not match.
     """
+
     @getTime
     def raise_exception():
         raise ValueError("This is an error")
