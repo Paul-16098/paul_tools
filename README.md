@@ -4,7 +4,7 @@
 
 ## dev
 
-```
+```bash
 poetry install
 pip install pytest-cov
 pytest test
