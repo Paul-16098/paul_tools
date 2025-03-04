@@ -38,11 +38,10 @@ def test_RollNumRegTools():
     Raises:
     - Exception: If the input string is invalid.
     """
-    roll = Roll(debug=True)
-    assert roll.RollNumRegTools("2d6+3") == [2, 6, 3]
-    assert roll.RollNumRegTools("d20") == [1, 20, 0]
+    assert Roll.RollNumTextToDataTools("2d6+3") == {"xD": 2, "Dy": 6, "sumBonus": 3}
+    assert Roll.RollNumTextToDataTools("d20") == {"xD": 1, "Dy": 20, "sumBonus": 0}
     with pytest.raises(Exception):
-        roll.RollNumRegTools("invalid")
+        Roll.RollNumTextToDataTools("invalid")
 
 
 def test_RollNum():
@@ -58,7 +57,7 @@ def test_RollNum():
         - The result dictionary contains the key "returnValueList".
     """
     roll = Roll(debug=True)
-    result = roll.RollNum("2d6+3")
+    result = roll.RollNum(Roll.RollNumTextToDataTools("2d6+3"))
     assert "rollValueList" in result
     assert "Type" in result
     assert "returnValueList" in result
@@ -164,9 +163,9 @@ def test_rollNum_Err():
     """
     roll = Roll(debug=True)
     with pytest.raises(Exception):
-        roll.RollNum("invalid")
+        roll.RollNum("invalid")  # type: ignore
     with pytest.raises(Exception):
-        roll.RollNum(Dy=None, rollText=None)
+        roll.RollNum(Dy=None, rollData=None)
 
 
 def test_RollNum_basic():
@@ -183,7 +182,7 @@ def test_RollNum_basic():
         - The rollValueList contains a value between 1 and 6.
     """
     roll = Roll(debug=True)
-    result = roll.RollNum("1d6")
+    result = roll.RollNum(Roll.RollNumTextToDataTools("1d6"))
     assert "rollValueList" in result
     assert "Type" in result
     assert "returnValueList" in result
@@ -204,7 +203,7 @@ def test_RollNum_with_bonus():
         - The rollValueList contains a value between 3 and 8.
     """
     roll = Roll(debug=True)
-    result = roll.RollNum("1d6+2", bonus=1)
+    result = roll.RollNum(Roll.RollNumTextToDataTools("1d6+2"), bonus=1)
     assert "rollValueList" in result
     assert "Type" in result
     assert "returnValueList" in result
@@ -225,7 +224,7 @@ def test_RollNum_multiple_dice():
         - The rollValueList contains two values each between 1 and 6.
     """
     roll = Roll()
-    result = roll.RollNum("2d6")
+    result = roll.RollNum(Roll.RollNumTextToDataTools("2d6"))
     assert "rollValueList" in result
     assert "Type" in result
     assert "returnValueList" in result
@@ -247,7 +246,7 @@ def test_RollNum_with_success():
         - The returnValueList contains the success status.
     """
     roll = Roll(rollType=RollType.DND)
-    result = roll.RollNum("1d20", success=10)
+    result = roll.RollNum(Roll.RollNumTextToDataTools("1d20"), success=10)
     assert "rollValueList" in result
     assert "Type" in result
     assert "returnValueList" in result
@@ -262,7 +261,7 @@ def test_RollNum_with_success():
 def test_RollDNDNumWithBigSuccess(monkeypatch):
     roll = Roll(rollType=RollType.DND)
     monkeypatch.setattr(Random, "randint", lambda *args, **kwargs: 20)
-    result = roll.RollNum("1d20", success=10)
+    result = roll.RollNum(Roll.RollNumTextToDataTools("1d20"), success=10)
     assert "rollValueList" in result
     assert "Type" in result
     assert "returnValueList" in result
@@ -272,7 +271,7 @@ def test_RollDNDNumWithBigSuccess(monkeypatch):
 def test_RollDNDNumWithBigNotSuccess(monkeypatch):
     roll = Roll(rollType=RollType.DND)
     monkeypatch.setattr(Random, "randint", lambda *args, **kwargs: 1)
-    result = roll.RollNum("1d20", success=10)
+    result = roll.RollNum(Roll.RollNumTextToDataTools("1d20"), success=10)
     assert "rollValueList" in result
     assert "Type" in result
     assert "returnValueList" in result
@@ -282,7 +281,7 @@ def test_RollDNDNumWithBigNotSuccess(monkeypatch):
 def test_RollCOCNumWithBigSuccess(monkeypatch):
     roll = Roll(rollType=RollType.COC)
     monkeypatch.setattr(Random, "randint", lambda *args, **kwargs: 0)
-    result = roll.RollNum("1d100", success=10)
+    result = roll.RollNum(Roll.RollNumTextToDataTools("1d100"), success=10)
     assert "rollValueList" in result
     assert "Type" in result
     assert "returnValueList" in result
@@ -292,7 +291,7 @@ def test_RollCOCNumWithBigSuccess(monkeypatch):
 def test_RollCOCNumWithBigNotSuccess(monkeypatch):
     roll = Roll(rollType=RollType.COC)
     monkeypatch.setattr(Random, "randint", lambda *args, **kwargs: 100)
-    result = roll.RollNum("1d100", success=10)
+    result = roll.RollNum(Roll.RollNumTextToDataTools("1d100"), success=10)
     assert "rollValueList" in result
     assert "Type" in result
     assert "returnValueList" in result

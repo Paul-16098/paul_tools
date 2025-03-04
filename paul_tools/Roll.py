@@ -1,3 +1,18 @@
+"""
+骰子擲點模塊
+
+這個模塊提供了進行各種骰子擲點的功能，支持:
+- 標準骰子擲點 (例如 1d6, 2d20)
+- DND規則判定
+- COC規則判定
+- 自定義列表隨機選擇
+
+主要類:
+- Roll: 骰子擲點的核心類
+- RollType: 擲點類型枚舉
+- returnType: 擲點結果類型枚舉
+"""
+
 import re
 import time
 from enum import Enum
@@ -22,7 +37,15 @@ T = TypeVar("T")
 
 
 class RollType(Enum):
-    """the type of the roll."""
+    """擲點類型枚舉
+
+    用於定義不同的擲點規則系統。
+
+    屬性:
+        NONE: 無特殊規則的普通擲點
+        DND: DND規則系統的擲點
+        COC: 克蘇魯的呼喚規則系統的擲點
+    """
 
     NONE = 0
 
@@ -31,15 +54,16 @@ class RollType(Enum):
 
 
 class returnType(Enum):
-    """
-    An enumeration representing different return types for a function or process.
+    """擲點結果類型枚舉
 
-    Attributes:
-        BigNotSuccess (int): Represents a significant failure with a value of -2.
-        notSuccess (int): Represents a failure with a value of -1.
-        NONE (int): Represents a neutral or no result with a value of 0.
-        success (int): Represents a success with a value of 1.
-        BigSuccess (int): Represents a significant success with a value of 2.
+    定義擲點的結果等級。
+
+    屬性:
+        BigNotSuccess: 大失敗 (-2)
+        notSuccess: 失敗 (-1)
+        NONE: 普通結果 (0)
+        success: 成功 (1)
+        BigSuccess: 大成功 (2)
     """
 
     BigNotSuccess = -2
@@ -61,31 +85,43 @@ class RollNumReturnType(TypedDict):
     returnValueList: list[RollNumReturnValueType]
 
 
+class RollNumRegToolsReturnType(TypedDict):
+    xD: int
+    Dy: int
+    sumBonus: int
+
+
 class Roll:
+    """骰子擲點核心類
+
+    提供各種骰子擲點相關的功能，包括:
+    - 解析擲點指令
+    - 執行擲點
+    - 判定成功失敗
+    - 計算期望值
+
+    屬性:
+        debug (bool): 是否開啟調試模式
+        rollType (RollType): 使用的擲點規則類型
+        logSum (bool): 是否記錄總和
+        isLog (bool): 是否輸出日誌
+        seed: 隨機數種子值
+    """
+
     rollNumTextStructureSet: set[re.Pattern[str]] = {
         re.compile(r"(\d*)(d|D)(\d+)(( +)?((\+|\-)(\d+)))?")
     }
+    """
+```ebnf
+ao = ( '+' | '-' );
+digit = ( '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' );
+number = [ ao ], { digit };
+rollText = [ number ], ( 'd' | 'D' ), number, [ ao, number ];
+```
+"""
 
     @staticmethod
     def rollTextReplace(text: str) -> str:
-        """
-        Replaces specific keywords in the input text with their corresponding translations.
-
-        Args:
-            text (str): The input text to be processed.
-
-        Returns:
-            str: The processed text with replacements if applicable.
-
-        Replacements:
-            - "int" or "intelligence" -> "智力"
-            - "san" or "sanity" -> "理智"
-
-        If a replacement is made, a space is appended to the result.
-
-        Logs:
-            Logs the input text and the resulting text after processing.
-        """
         isReplace: bool = True
         rText = text
         match text.lower():
@@ -144,24 +180,31 @@ class Roll:
         self.__random_obj.seed(self.__seed)
         logger.debug(f"set seed={self.__seed}")
 
-    def RollNumRegTools(self, rollText: str):
-        rollTextNotMatchTheStructure = Exception(
-            self.__i18n_obj.locale(
-                "paul_tools__Roll__Roll__Exception__rollText_Not_Match_The_Structure",
-                repr(rollText),
-                repr(self.rollNumTextStructureSet),
-            )
-        )
+    @staticmethod
+    def RollNumTextToDataTools(rollText: str) -> RollNumRegToolsReturnType:
+        """解析擲點指令文本
+
+        將形如 "1d20+5" 的擲點指令解析為可用的數值參數
+
+        參數:
+            rollText: 擲點指令文本，例如 "2d6+3"
+
+        返回:
+            包含 [擲點次數, 骰子面數, 加值] 的列表
+
+        異常:
+            Exception: 當指令格式不符合規範時拋出
+        """
         rollData: list[str] | None = None
         userReg = None
-        for rollTextStructure in self.rollNumTextStructureSet:
+        for rollTextStructure in Roll.rollNumTextStructureSet:
             if (tmp1 := re.search(rollTextStructure, rollText)) is None:
                 continue
             userReg = rollTextStructure
             rollData = [tmp1.group(1), tmp1.group(3), tmp1.group(6)]
             break
         if rollData is None or len(rollData) != 3:
-            raise rollTextNotMatchTheStructure
+            raise Exception
         else:
             logger.debug(f"RollNumRegTools({repr(rollText)})--{userReg=}")
 
@@ -173,11 +216,15 @@ class Roll:
         for tmp1 in rollData:
             intRollData.append(int(tmp1))
         logger.debug(f"RollNumRegTools({repr(rollText)})--{userReg=}-{intRollData=}")
-        return intRollData
+        return {
+            "xD": intRollData[0],
+            "Dy": intRollData[1],
+            "sumBonus": intRollData[2],
+        }
 
     def RollNum(
         self,
-        rollText: str | None = None,
+        rollData: RollNumRegToolsReturnType | None = None,
         *,
         xD: int | None = None,
         Dy: int | None = None,
@@ -186,16 +233,34 @@ class Roll:
         success: int | None = None,
         whyJudged: str = "",
     ) -> RollNumReturnType:
-        if Dy is None:
-            if rollText is not None:
-                intRollData = self.RollNumRegTools(rollText)
+        """執行骰子擲點並進行結果判定
 
-                xD, Dy = [intRollData[0], intRollData[1]]
-                if sumBonus == 0:
-                    sumBonus = intRollData[2]
-            else:
-                logger.warning("Dy is None and rollText is None")
-                raise ValueError("Dy is None and rollText is None")
+        支援:
+        - 基礎擲點計算
+        - 成功/失敗判定
+        - 大成功/大失敗判定
+        - 結果統計和輸出
+
+        參數:
+            xD (int): 擲點次數
+            Dy (int): 骰子面數
+            sumBonus (int): 總結果加值
+            bonus (int): 每次擲點加值
+            success (int): 成功判定閾值
+            whyJudged (str): 擲點原因說明
+
+        返回:
+            包含擲點結果的字典，包括:
+            - rollValueList: 擲點結果列表
+            - Type: 擲點類型
+            - returnValueList: 詳細結果列表
+        """
+        if rollData:
+            xD, Dy, sumBonus = rollData["xD"], rollData["Dy"], rollData["sumBonus"]
+
+        if Dy is None:
+            logger.warning("Dy is None and rollData is None")
+            raise ValueError("Dy is None and rollData is None")
 
         if xD is None:
             xD = 1
@@ -328,18 +393,19 @@ class Roll:
     def getExpectedValue(
         self, values: list[int] | list[float], probabilities: list[float]
     ) -> float:
-        """計算給定值和對應概率的期望值。
+        """計算期望值
 
-        Args:
-            values (list[int] | list[float]): 一個包含數值的列表。
-            probabilities (list[float]): 對應於數值的概率列表。
+        根據給定的值和對應概率計算期望值。
 
-        Raises:
-            ValueError: 如果 values 與 probabilities 長度不等。
-            ValueError: 如果概率之和不等於 1。
+        參數:
+            values: 可能的值列表
+            probabilities: 對應的概率列表
 
-        Returns:
-            float: 計算出的期望值。
+        返回:
+            計算出的期望值
+
+        異常:
+            ValueError: 當參數不合法時拋出
         """
         # 檢查 values 和 probabilities 的長度是否相等
         if len(values) != len(probabilities):

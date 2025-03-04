@@ -68,14 +68,14 @@ def test_retry_invalid_parameters():
     with pytest.raises(ValueError, match=reg):
 
         @retry(retries=0, delay=0.1)
-        def invalid_retries():
-            pass  # pragma: no cover
+        def invalid_retries():  # pragma: no cover
+            pass
 
     with pytest.raises(ValueError, match=reg):
 
         @retry(retries=3, delay=0)
-        def invalid_delay():
-            pass  # pragma: no cover
+        def invalid_delay():  # pragma: no cover
+            pass
 
 
 def test_retry_delay():

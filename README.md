@@ -6,6 +6,6 @@
 
 ```bash
 poetry install
-pip install pytest-cov
+pip install pytest pytest-cov
 pytest test
 ```
