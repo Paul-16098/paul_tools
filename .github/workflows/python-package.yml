@@ -22,6 +22,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip uv
           uv venv
+          source .venv/bin/activate
           if [ -f pyproject.toml ]; then uv pip install --group dev -r pyproject.toml; fi
       - name: Lint with flake8
         run: |
