@@ -20,8 +20,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install flake8 pytest uv
+          python -m pip install --upgrade pip uv
+          uv venv
+          uv pip install flake8 pytest
           if [ -f pyproject.toml ]; then uv pip install -r pyproject.toml; fi
       - name: Lint with flake8
         run: |
