@@ -21,12 +21,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip uv
-          uv venv
+          uv venv .venv
           source .venv/bin/activate
           if [ -f pyproject.toml ]; then uv pip install --group dev -r pyproject.toml; fi
       - name: Lint with flake8
         run: |
-          source ./.venv/Scripts/activate
+          source .venv/bin/activate
           # 如果存在 Python 語法錯誤或未定義的名稱，請停止構建
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero 將所有錯誤視為警告。 GitHub 編輯器的寬度為 127 個字符
