@@ -22,7 +22,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip uv
           uv venv
-          if [ -f pyproject.toml ]; then uv pip install -r pyproject.toml; fi
+          if [ -f pyproject.toml ]; then uv pip install --group dev -r pyproject.toml; fi
       - name: Lint with flake8
         run: |
           # 如果存在 Python 語法錯誤或未定義的名稱，請停止構建
