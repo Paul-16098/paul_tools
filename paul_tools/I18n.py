@@ -10,6 +10,14 @@ __all__ = ["I18n"]
 
 
 class I18n:
+    """
+    A class for handling internationalization (i18n) and localization.
+
+    Attributes:
+        DIR_ROOT (str): The root directory for language files.
+        DIR_LANGS_ROOT (str): The directory where language files are stored.
+        LANG_JSON (dict): A dictionary containing language-specific JSON data.
+    """
     ver = "1.0.0.0"
 
     LANG_MAP = {"zh": "zh_cn", "chinese (traditional)_hong kong sar": "zh_hk"}
@@ -59,10 +67,12 @@ class I18n:
     ) -> None:
         """
         Initialize the I18n class.
+
         Args:
             Langs (list[str]): A list of language codes to load. Defaults to ["sys", "en_us"].
             dirRoot (str): The root directory where language files are stored. Defaults to the current working directory.
             langJson (dict[str, dict[str, str]]): A dictionary containing language-specific JSON data to merge with the loaded files. Defaults to an empty dictionary.
+
         Raises:
             ValueError: If the Langs list is empty.
         """
@@ -72,14 +82,14 @@ class I18n:
 
         if len(Langs) == 0:
             raise ValueError("Langs must contain at least one language code.")
+
         self.langs = [self.langReplace(lang) for lang in Langs]
         logger.debug(f"langs: {self.langs}")
         logger.debug(f"langJson: {langJson}")
         logger.debug(f"DIR_LANGS_ROOT: {self.DIR_LANGS_ROOT}")
 
-        # #tag load
+        # Load language files and merge with provided JSON data
         for lang in reversed(self.langs):
-            # print(lang, end=" ")
             dF = {
                 "#": "{file_name}__{class_name}__{func_name}__{id}",
                 "updata": time.strftime("%Y/%m/%d %H:%M UTC%z"),
@@ -94,11 +104,10 @@ class I18n:
                 ) as f:
                     fileJson = json.load(f)
             except FileNotFoundError:
-                fileJson = dF  # 使用默認值
+                fileJson = dF  # Use default values if file not found
             except json.JSONDecodeError:
-                fileJson = dF
+                fileJson = dF  # Use default values if JSON is invalid
 
-            # breakpoint()
             self.LANG_JSON.update(fileJson)
             self.LANG_JSON.update(langJson.get(lang, {}))
         logger.debug(f"LANG_JSON: {self.LANG_JSON}")

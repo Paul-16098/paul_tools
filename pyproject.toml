@@ -1,6 +1,6 @@
 [project]
     name = "paul-tools"
-    version = "1.0.6"
+    version = "1.0.7"
     description = "一個簡單的lib"
     authors = [
         { name = "Paul-16098", email = "pl816098@gmail.com" },
@@ -15,9 +15,3 @@
 
     [project.urls]
         source = "https://github.com/Paul-16098/paul_tools"
-
-[build-system]
-    requires = [
-        "poetry-core>=2.0.0,<3.0.0",
-    ]
-    build-backend = "poetry.core.masonry.api"

@@ -2,9 +2,9 @@ name: 上傳Python包
 
 on:
   workflow_dispatch:
-  push: 
+  push:
     paths: pyproject.toml
-  pull_request: 
+  pull_request:
     paths: pyproject.toml
     types: [closed]
 
@@ -25,8 +25,8 @@ jobs:
       - name: Build release distributions
         run: |
           # NOTE: put your own distribution build steps here.
-          pip install poetry
-          poetry build
+          pip install uv
+          uv build
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4

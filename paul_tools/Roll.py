@@ -92,20 +92,16 @@ class RollNumRegToolsReturnType(TypedDict):
 
 
 class Roll:
-    """骰子擲點核心類
+    """
+    A class for handling dice rolling operations with various rules and configurations.
 
-    提供各種骰子擲點相關的功能，包括:
-    - 解析擲點指令
-    - 執行擲點
-    - 判定成功失敗
-    - 計算期望值
-
-    屬性:
-        debug (bool): 是否開啟調試模式
-        rollType (RollType): 使用的擲點規則類型
-        logSum (bool): 是否記錄總和
-        isLog (bool): 是否輸出日誌
-        seed: 隨機數種子值
+    Attributes:
+        debug (bool): Whether to enable debug mode for additional logging.
+        rollType (RollType): The type of rolling system to use (e.g., NONE, DND, COC).
+        logSum (bool): Whether to log the sum of roll results.
+        isLog (bool): Whether to enable logging for roll operations.
+        __seed (int | float | str | bytes | bytearray): The seed value for random number generation.
+        __random_obj (Random): The random number generator instance.
     """
 
     rollNumTextStructureSet: set[re.Pattern[str]] = {
@@ -143,6 +139,16 @@ rollText = [ number ], ( 'd' | 'D' ), number, [ ao, number ];
         isLog: bool = True,
         seed: int | float | str | bytes | bytearray = time.time(),
     ) -> None:
+        """
+        Initialize the Roll class.
+
+        Args:
+            debug (bool): Enable debug mode for additional logging. Defaults to False.
+            rollType (RollType): The type of rolling system to use. Defaults to RollType.NONE.
+            logSum (bool): Enable logging for the sum of roll results. Defaults to True.
+            isLog (bool): Enable logging for roll operations. Defaults to True.
+            seed (int | float | str | bytes | bytearray): The seed value for random number generation. Defaults to the current time.
+        """
         self.debug = debug
         self.rollType = rollType
         self.logSum = logSum
@@ -172,13 +178,25 @@ rollText = [ number ], ( 'd' | 'D' ), number, [ ao, number ];
 
     @property
     def seed(self) -> int | float | str | bytes | bytearray:
+        """
+        Get the current seed value for the random number generator.
+
+        Returns:
+            int | float | str | bytes | bytearray: The current seed value.
+        """
         return self.__seed
 
     @seed.setter
     def seed(self, seed: int | float | str | bytes | bytearray) -> None:
+        """
+        Set a new seed value for the random number generator.
+
+        Args:
+            seed (int | float | str | bytes | bytearray): The new seed value.
+        """
         self.__seed = seed
         self.__random_obj.seed(self.__seed)
-        logger.debug(f"set seed={self.__seed}")
+        logger.debug(f"random.seed updated: {self.seed}")
 
     @staticmethod
     def RollNumTextToDataTools(rollText: str) -> RollNumRegToolsReturnType:
